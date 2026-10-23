@@ -38,10 +38,11 @@ venv.bak/
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints
 
-# Large datasets (M5 Raw CSV files > 100MB)
+# Large datasets (M5 Raw & Processed data files > 100MB)
 data/raw/*.csv
 data/raw/*.zip
 data/processed/*.csv
+data/processed/*.parquet
 
 # Allow .gitkeep to preserve directory structure
 !data/raw/.gitkeep
