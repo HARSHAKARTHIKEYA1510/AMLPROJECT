@@ -1,0 +1,103 @@
+{
+  "calendar": {
+    "table": "calendar",
+    "total_records": 1969,
+    "date_range": [
+      "2011-01-29",
+      "2016-06-19"
+    ],
+    "is_continuous": true,
+    "null_counts": {
+      "date": 0,
+      "wm_yr_wk": 0,
+      "weekday": 0,
+      "wday": 0,
+      "month": 0,
+      "year": 0,
+      "d": 0,
+      "event_name_1": 1807,
+      "event_type_1": 1807,
+      "event_name_2": 1964,
+      "event_type_2": 1964,
+      "snap_CA": 0,
+      "snap_TX": 0,
+      "snap_WI": 0
+    },
+    "null_percentages": {
+      "date": 0.0,
+      "wm_yr_wk": 0.0,
+      "weekday": 0.0,
+      "wday": 0.0,
+      "month": 0.0,
+      "year": 0.0,
+      "d": 0.0,
+      "event_name_1": 91.77,
+      "event_type_1": 91.77,
+      "event_name_2": 99.75,
+      "event_type_2": 99.75,
+      "snap_CA": 0.0,
+      "snap_TX": 0.0,
+      "snap_WI": 0.0
+    },
+    "event_days_1": 162,
+    "event_days_2": 5,
+    "snap_days_per_state": {
+      "CA": 650,
+      "TX": 650,
+      "WI": 650
+    },
+    "quality_verdict": "PASSED (Nulls in event fields are structural non-event days)"
+  },
+  "sell_prices": {
+    "table": "sell_prices",
+    "total_records": 6841121,
+    "total_missing_values": 0,
+    "unique_items": 3049,
+    "unique_stores": 10,
+    "price_summary": {
+      "min": 0.01,
+      "max": 107.32,
+      "mean": 4.41,
+      "median": 3.47,
+      "std": 3.41
+    },
+    "anomalies": {
+      "negative_prices": 0,
+      "zero_prices": 0
+    },
+    "quality_verdict": "PASSED (No missing, negative, or zero prices detected)"
+  },
+  "sales": {
+    "table": "sales_train_validation",
+    "total_time_series": 30490,
+    "total_days": 1913,
+    "total_observations": 58327370,
+    "hierarchy": {
+      "unique_items": 3049,
+      "unique_stores": 10,
+      "unique_states": 3,
+      "unique_categories": 3,
+      "unique_departments": 7,
+      "expected_combinations": 30490
+    },
+    "data_cleanliness": {
+      "missing_values": 0,
+      "negative_sales": 0,
+      "extreme_spikes_count": 5821,
+      "p99_99_threshold": 106.0
+    },
+    "intermittent_demand_profile": {
+      "raw_zero_sales_count": 39777094,
+      "raw_zero_sales_pct": 68.2,
+      "leading_pre_release_zeros": 12384870,
+      "active_observations": 45942500,
+      "active_zero_sales_pct": 59.62
+    },
+    "systemic_anomalies": {
+      "min_sales_day": "d_697",
+      "min_sales_total": 11,
+      "explanation": "Walmart store-wide closure on Christmas Day (Dec 25)"
+    },
+    "quality_verdict": "PASSED (Zero nulls, strictly non-negative; structural zeros characterized)"
+  }
+}
