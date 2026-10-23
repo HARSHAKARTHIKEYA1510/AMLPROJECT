@@ -48,6 +48,10 @@ data/processed/*.parquet
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 
+# Personal viva study notes (excluded from GitHub push)
+reports/viva_preparation_guide.md
+*viva*
+
 # macOS metadata
 .DS_Store
 .AppleDouble

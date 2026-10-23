@@ -99,7 +99,6 @@ AMLPROJECT/
     ├── data_quality_report.json        # Machine-readable audit metrics
     ├── eda_findings.md                 # Academic EDA findings & theoretical justification
     ├── eda_metrics.json                # Numerical EDA metrics
-    ├── viva_preparation_guide.md       # 10 comprehensive viva voce defense Q&As
     └── figures/                        # 9 High-resolution publication plots (300 DPI)
         ├── 01_hierarchical_sales_overview.png
         ├── 02_intermittent_croston_matrix.png
@@ -164,8 +163,7 @@ jupyter notebook notebooks/02_exploratory_data_analysis.ipynb
 | **Dataset Quality & Ingestion** | Full data audit, memory downcasting, schema validation | `src/data_loader.py`, `src/data_cleaning.py`, `reports/data_quality_report.md` |
 | **Exploratory Data Analysis** | Syntetos-Boylan matrix, SNAP uplift, seasonality | `src/eda_analysis.py`, `reports/eda_findings.md`, `reports/eda_metrics.json` |
 | **Visualizations** | 9 Publication-grade 300 DPI figures | `reports/figures/`, `src/visualization.py` |
-| **Theoretical Rigor** | Mathematical justification for Kalman Filters & DeepAR | `reports/eda_findings.md`, Section 5 |
-| **Viva Voce Preparation** | 10 Detailed Technical Defense Q&As | `reports/viva_preparation_guide.md` |
+| **Theoretical Rigor & Methodology**| Mathematical justification for Kalman Filters & DeepAR | `reports/eda_findings.md`, Section 5 |
 | **Code Quality & Reproducibility**| Modular package, type hints, PEP 8, git documentation | `src/`, `notebooks/`, and `data/` |
 
 ---
