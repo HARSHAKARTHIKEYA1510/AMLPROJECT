@@ -88,8 +88,7 @@ AMLPROJECT/
 │   ├── data_cleaning.py                # Cleaning pipeline, stockout & cold-start markers
 │   ├── eda_analysis.py                 # Croston classification, SNAP uplift, ADF, Kalman filter
 │   ├── visualization.py                # 300 DPI publication plotting engine
-│   ├── run_eda_pipeline.py             # End-to-end execution script
-│   └── generate_notebooks.py           # Programmatic generator for both notebooks
+│   └── run_eda_pipeline.py             # End-to-end execution script
 │
 ├── notebooks/
 │   ├── 01_data_cleaning.ipynb          # Dedicated Data Cleaning notebook
