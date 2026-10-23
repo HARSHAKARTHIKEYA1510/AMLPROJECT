@@ -240,7 +240,8 @@ class M5DataCleaner:
         clean_cal = self.clean_calendar(df_cal)
         cal_out = self.processed_dir / "cleaned_calendar.parquet"
         clean_cal.to_parquet(cal_out, index=False)
-        print(f"[SAVED] Cleaned Calendar -> {cal_out.name} ({clean_cal.shape})")
+        clean_cal.to_csv(self.processed_dir / "cleaned_calendar.csv", index=False)
+        print(f"[SAVED] Cleaned Calendar -> {cal_out.name} & .csv ({clean_cal.shape})")
 
         # 2. Clean Prices
         clean_prices = self.clean_prices(df_prices)
@@ -252,7 +253,8 @@ class M5DataCleaner:
         sku_meta = self.analyze_lifecycle_and_stockouts(df_sales)
         meta_out = self.processed_dir / "sku_lifecycle_metadata.parquet"
         sku_meta.to_parquet(meta_out, index=False)
-        print(f"[SAVED] SKU Lifecycle Metadata -> {meta_out.name} ({sku_meta.shape})")
+        sku_meta.to_csv(self.processed_dir / "sku_lifecycle_metadata.csv", index=False)
+        print(f"[SAVED] SKU Lifecycle Metadata -> {meta_out.name} & .csv ({sku_meta.shape})")
 
         # 4. Clean Sales Matrix & Downcast
         print("[CLEANING] Optimizing sales matrix for processed storage...")
@@ -268,7 +270,8 @@ class M5DataCleaner:
         )
         starter_out = self.processed_dir / "m5_starter_modeling_panel.parquet"
         starter_panel.to_parquet(starter_out, index=False)
-        print(f"[SAVED] Starter Modeling Panel -> {starter_out.name} ({starter_panel.shape})")
+        starter_panel.to_csv(self.processed_dir / "m5_starter_modeling_panel.csv", index=False)
+        print(f"[SAVED] Starter Modeling Panel -> {starter_out.name} & .csv ({starter_panel.shape})")
 
         elapsed = time.time() - start_time
         print(f"\n[DONE] Data Cleaning pipeline completed in {elapsed:.2f} seconds.")
