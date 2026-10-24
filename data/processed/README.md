@@ -1,34 +1,32 @@
 # Processed Data Directory (`data/processed/`)
 
-This directory contains the cleaned, standardized, and feature-engineered datasets in **CSV format** produced by [`src/data_cleaning.py`](../../src/data_cleaning.py).
+This directory contains the cleaned, standardized datasets in **CSV format** produced by [`src/data_cleaning.py`](../../src/data_cleaning.py).
 
-## Available CSV Files:
+Every raw file in `data/raw/` has an exact **1-to-1 cleaned counterpart** in `data/processed/`:
 
-| File Name | Format | Size | On GitHub? | Description & Usage |
-| :--- | :--- | :--- | :--- | :--- |
-| **`cleaned_calendar.csv`** | CSV | **201 KB** | ✅ **Yes** | Daily calendar with cyclical trigonometric features, SNAP flags, Christmas markers |
-| **`sku_lifecycle_metadata.csv`** | CSV | **2.5 MB** | ✅ **Yes** | Product release dates, active shelf days, and **cold-start indicators** (`is_cold_start`) |
-| **`m5_starter_modeling_panel.csv`** | CSV | **18.9 MB** | ✅ **Yes** | **Recommended starter modeling panel** (CA_1 `FOODS_1`, 50 SKUs, 95.6K rows) with complete dates, causal lags ($t-1, 7, 14, 28$), rolling stats, and **stockout flags** |
-| **`cleaned_sales_sample.csv`** | CSV | **1.9 MB** | ✅ **Yes** | 500-row preview sample of the cleaned sales matrix for instant CSV inspection |
-| **`cleaned_prices_sample.csv`** | CSV | **229 KB** | ✅ **Yes** | 5,000-row preview sample of the cleaned prices table for instant CSV inspection |
-| **`cleaned_sales_matrix.csv`** | CSV | **114 MB** | ⚙️ **Local** | Full 30,490 SKU sales matrix in CSV (local only due to GitHub's 100 MB limit) |
-| **`cleaned_prices.csv`** | CSV | **307 MB** | ⚙️ **Local** | Full 6.84M price records in CSV (local only due to GitHub's 100 MB limit) |
+## 1-to-1 Dataset Mapping:
+
+| # | Raw File (`data/raw/`) | Cleaned File (`data/processed/`) | Rows | Size | On GitHub? | Cleaning Applied |
+| :---: | :--- | :--- | :--- | :--- | :---: | :--- |
+| **1** | **`calendar.csv`** | **`cleaned_calendar.csv`** | 1,969 | **216 KB** | ✅ **Yes** | Date parsing, cyclical temporal features (`day_sin`/`cos`, `month_sin`/`cos`), null events labeled 'None', SNAP & Christmas markers. |
+| **2** | **`sell_prices.csv`** | **`cleaned_sell_prices.csv`** | 6,841,121 | **274 MB** | ⚙️ **Local** | Verified non-negative prices, regular price baselines, discount depth percentages, promo markers. |
+| **3** | **`sales_train_validation.csv`** | **`cleaned_sales_train_validation.csv`** | 30,490 | **114 MB** | ⚙️ **Local** | Validated 0 nulls, 0 negative values across 1,913 days, non-negative integer clipping. |
+| **4** | **`sales_train_evaluation.csv`** | **`cleaned_sales_train_evaluation.csv`** | 30,490 | **116 MB** | ⚙️ **Local** | Validated 0 nulls, 0 negative values across 1,941 days. |
+| **5** | **`sample_submission.csv`** | **`cleaned_sample_submission.csv`** | 60,980 | **5.0 MB** | ✅ **Yes** | Verified forecast horizon schema ($F_1$ to $F_{28}$), zero-filled formatted baseline template. |
+
+> ℹ️ **GitHub 100 MB Rule:**  
+> Files under 100 MB (`cleaned_calendar.csv` and `cleaned_sample_submission.csv`) are tracked directly on GitHub.  
+> The 3 large CSV files (`cleaned_sell_prices.csv`, `cleaned_sales_train_validation.csv`, and `cleaned_sales_train_evaluation.csv`) are $>100$ MB and reside locally in your `data/processed/` folder to prevent GitHub push errors. Run `python3 src/data_cleaning.py` to regenerate all 5 cleaned files at any time.
 
 ---
 
-## 💡 How to Load the Cleaned CSV Data:
-
-### In Python / Pandas:
+## 💡 How to Load in Python:
 ```python
 import pandas as pd
 
-# Load cleaned CSV files:
 df_calendar = pd.read_csv("data/processed/cleaned_calendar.csv")
-df_lifecycle = pd.read_csv("data/processed/sku_lifecycle_metadata.csv")
-df_starter_panel = pd.read_csv("data/processed/m5_starter_modeling_panel.csv")
-df_sales = pd.read_csv("data/processed/cleaned_sales_matrix.csv")
-df_prices = pd.read_csv("data/processed/cleaned_prices.csv")
+df_prices   = pd.read_csv("data/processed/cleaned_sell_prices.csv")
+df_sales    = pd.read_csv("data/processed/cleaned_sales_train_validation.csv")
+df_eval     = pd.read_csv("data/processed/cleaned_sales_train_evaluation.csv")
+df_sub      = pd.read_csv("data/processed/cleaned_sample_submission.csv")
 ```
-
-### In Microsoft Excel / Google Sheets:
-You can directly open `cleaned_calendar.csv`, `sku_lifecycle_metadata.csv`, `m5_starter_modeling_panel.csv`, or the preview samples in any spreadsheet editor.

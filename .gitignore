@@ -42,14 +42,17 @@ venv.bak/
 data/raw/sell_prices.csv
 data/raw/sales_train_validation.csv
 data/raw/sales_train_evaluation.csv
-data/processed/cleaned_prices.csv
-data/processed/cleaned_sales_matrix.csv
+data/processed/cleaned_sell_prices.csv
+data/processed/cleaned_sales_train_validation.csv
+data/processed/cleaned_sales_train_evaluation.csv
 data/raw/*.zip
 *.parquet
 
-# Allow smaller raw files and all processed data
+# Allow smaller raw and cleaned data files
 !data/raw/calendar.csv
 !data/raw/sample_submission.csv
+!data/processed/cleaned_calendar.csv
+!data/processed/cleaned_sample_submission.csv
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 

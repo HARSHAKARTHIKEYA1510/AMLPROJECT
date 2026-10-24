@@ -29,17 +29,19 @@ The project enforces clean separation between raw immutable data and cleaned, fe
 
 ```text
 data/
-├── raw/                              # Immutable raw files from Kaggle / M5 source
-│   ├── calendar.csv                  # Daily calendar attributes & events (1,969 days)
-│   ├── sell_prices.csv               # Weekly store-item sell prices (6,841,121 rows)
-│   └── sales_train_validation.csv    # Daily sales matrix (30,490 SKUs x 1,913 days)
+├── raw/                                      # 5 Raw files from Kaggle / M5 source
+│   ├── calendar.csv                          # Daily calendar attributes & events (1,969 days)
+│   ├── sell_prices.csv                       # Weekly store-item sell prices (6,841,121 rows)
+│   ├── sales_train_validation.csv            # Daily sales matrix (days 1 to 1913)
+│   ├── sales_train_evaluation.csv            # Daily sales matrix (extended to day 1941)
+│   └── sample_submission.csv                 # Official forecasting submission template
 │
-└── processed/                        # Cleaned CSV datasets & modeling panel
-    ├── cleaned_calendar.csv          # Cyclical encodings (sin/cos), SNAP & holiday markers
-    ├── sku_lifecycle_metadata.csv    # First sale day, active duration, cold-start flags
-    ├── m5_starter_modeling_panel.csv # Starter panel (CA_1 FOODS_1, 50 SKUs, 95.6K rows) with lags & stockouts
-    ├── cleaned_sales_sample.csv      # 500-row preview sample of sales matrix
-    └── cleaned_prices_sample.csv     # 5,000-row preview sample of prices table
+└── processed/                                # Exactly 5 Cleaned CSV files (1-to-1 counterpart)
+    ├── cleaned_calendar.csv                  # Cyclical encodings (sin/cos), SNAP & holiday markers
+    ├── cleaned_sell_prices.csv               # Regular price baselines, discount depth percentages
+    ├── cleaned_sales_train_validation.csv    # Cleaned unit sales matrix (days 1 to 1913)
+    ├── cleaned_sales_train_evaluation.csv    # Cleaned unit sales matrix (days 1 to 1941)
+    └── cleaned_sample_submission.csv         # Validated submission template
 ```
 
 ---
