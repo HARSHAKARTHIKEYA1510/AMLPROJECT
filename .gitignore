@@ -45,6 +45,7 @@ data/raw/sales_train_evaluation.csv
 data/processed/cleaned_prices.csv
 data/processed/cleaned_sales_matrix.csv
 data/raw/*.zip
+*.parquet
 
 # Allow smaller raw files and all processed data
 !data/raw/calendar.csv

@@ -34,13 +34,12 @@ data/
 │   ├── sell_prices.csv               # Weekly store-item sell prices (6,841,121 rows)
 │   └── sales_train_validation.csv    # Daily sales matrix (30,490 SKUs x 1,913 days)
 │
-└── processed/                        # Memory-optimized, cleaned Parquet artifacts
-    ├── cleaned_calendar.parquet      # Cyclical encodings (sin/cos), SNAP & holiday markers
-    ├── cleaned_prices.parquet        # Regular price baselines, discount depth percentages
-    ├── sku_lifecycle_metadata.parquet# First sale day, active duration, cold-start flags
-    ├── cleaned_sales_matrix.parquet  # Memory-downcasted 16/8-bit sales matrix (~75% RAM saved)
-    └── m5_starter_modeling_panel.parquet # Long-format panel (CA_1 FOODS_1, 50 SKUs, 95.6K rows)
-                                      # Complete date index, causal lags, rolling features, stockout flags
+└── processed/                        # Cleaned CSV datasets & modeling panel
+    ├── cleaned_calendar.csv          # Cyclical encodings (sin/cos), SNAP & holiday markers
+    ├── sku_lifecycle_metadata.csv    # First sale day, active duration, cold-start flags
+    ├── m5_starter_modeling_panel.csv # Starter panel (CA_1 FOODS_1, 50 SKUs, 95.6K rows) with lags & stockouts
+    ├── cleaned_sales_sample.csv      # 500-row preview sample of sales matrix
+    └── cleaned_prices_sample.csv     # 5,000-row preview sample of prices table
 ```
 
 ---
@@ -79,7 +78,7 @@ AMLPROJECT/
 │
 ├── data/
 │   ├── raw/                            # Raw M5 dataset (calendar, prices, sales)
-│   └── processed/                      # Cleaned Parquet tables & starter panel
+│   └── processed/                      # Cleaned CSV tables & starter panel
 │
 ├── src/
 │   ├── __init__.py                     # Package init
@@ -137,7 +136,7 @@ Rendered at 300 DPI in `reports/figures/`:
 ```bash
 python3 src/data_cleaning.py
 ```
-*Loads raw data, performs schema checks, creates stockout/cold-start flags, and exports clean Parquet tables to `data/processed/` in ~7 seconds.*
+*Loads raw data, performs schema checks, creates stockout/cold-start flags, and exports clean CSV tables to `data/processed/` in ~7 seconds.*
 
 ### 2. Run Full EDA & Visualization Pipeline
 ```bash
