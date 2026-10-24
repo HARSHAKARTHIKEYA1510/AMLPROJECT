@@ -100,12 +100,16 @@ AMLPROJECT/
 │   ├── run_baseline_pipeline.py        # Baseline evaluation & report orchestration
 │   ├── kalman_filter_model.py          # Structural State-Space Kalman Filter per SKU
 │   ├── kalman_visualization.py         # 300 DPI Kalman tracking & 3-way benchmark visualizer
-│   └── run_kalman_pipeline.py          # Kalman pipeline runner & report generator
+│   ├── run_kalman_pipeline.py          # Kalman pipeline runner & report generator
+│   ├── deepar_model.py                 # Global DeepAR Probabilistic Autoregressive Forecaster
+│   ├── deepar_visualization.py         # 300 DPI DeepAR tracking & 4-way benchmark visualizer
+│   └── run_deepar_pipeline.py          # DeepAR pipeline orchestrator & report generator
 │
 ├── tests/
 │   ├── test_feature_engineering.py     # Feature engineering pytest suite
 │   ├── test_baseline_models.py         # Baseline forecasting & zero-leakage pytest suite
-│   └── test_kalman_filter.py           # Kalman filter unit & integration test suite (7 tests)
+│   ├── test_kalman_filter.py           # Kalman filter unit & integration test suite (7 tests)
+│   └── test_deepar_model.py            # DeepAR unit & integration test suite (9 tests)
 │
 ├── notebooks/
 │   ├── 01_data_cleaning.ipynb          # Dedicated Data Cleaning notebook
@@ -120,7 +124,9 @@ AMLPROJECT/
     ├── baseline_metrics.json           # Machine-readable baseline metrics (MAE, RMSE, WAPE)
     ├── kalman_findings.md              # Comprehensive Kalman Filter benchmark report
     ├── kalman_metrics.json             # Machine-readable Kalman metrics & CI coverage
-    └── figures/                        # 15 High-resolution publication plots (300 DPI)
+    ├── deepar_findings.md              # Comprehensive Global DeepAR benchmark report
+    ├── deepar_metrics.json             # Machine-readable DeepAR metrics, pinball & CI coverage
+    └── figures/                        # High-resolution publication plots (300 DPI)
         ├── 01_hierarchical_sales_overview.png
         ├── 02_intermittent_croston_matrix.png
         ├── 03_zero_demand_distribution.png
@@ -135,7 +141,10 @@ AMLPROJECT/
         ├── 12_baseline_metric_comparison.png
         ├── 13_kalman_aggregate_tracking.png
         ├── 14_kalman_sku_trajectories.png
-        └── 15_three_way_model_comparison.png
+        ├── 15_three_way_model_comparison.png
+        ├── 16_four_way_model_comparison.png
+        ├── deepar_forecasts.png
+        └── deepar_prediction_intervals.png
 ```
 
 ---
@@ -160,7 +169,10 @@ Rendered at 300 DPI in `reports/figures/`:
 | **12. Model Metric Comparison** | MAE, RMSE, and WAPE comparison across categories | GBDT achieves **+14.64%** lower WAPE over Seasonal-Naive |
 | **13. Kalman Aggregate Tracking** | 28-day system demand tracking vs Kalman + 95% band | 90.07% empirical coverage across portfolio aggregate |
 | **14. Kalman SKU Trajectories** | Multi-panel SKU forecasts with 95% & 80% confidence bands | Adapts to local trend & weekly harmonic cycles per SKU |
-| **15. Three-Way Model Benchmark** | SNaive vs GBDT vs Kalman Filter per SKU | **Kalman Filter achieves lowest MAE (0.9333) & WAPE (80.06%)** |
+| **15. Three-Way Model Benchmark** | SNaive vs GBDT vs Kalman Filter per SKU | Kalman Filter achieves lowest MAE (0.9333) & WAPE (80.06%) |
+| **16. Four-Way Model Benchmark** | SNaive vs GBDT vs Kalman Filter vs Global DeepAR | **Global DeepAR achieves lowest RMSE (2.2221) & 91.79% 80% CI coverage** |
+| **DeepAR Forecasts** | Daily system demand vs DeepAR P50 + 80% CI envelope | Captures aggregate momentum with strict causal rollout |
+| **DeepAR Prediction Intervals** | SKU trajectories with [P10, P90] predictive intervals | Non-negative quantile bounds across categories |
 
 ---
 
@@ -209,13 +221,30 @@ python3 src/run_kalman_pipeline.py
 ```
 *Fits an independent Basic Structural Time Series Kalman Filter per SKU (Local Level + 7-Day Weekly Seasonality), forecasts the 28-day out-of-sample validation horizon with exact analytical uncertainty bands, computes MAE, RMSE, WAPE, and prediction interval coverage (90.07% at 95% CI), and generates publication-grade figures 13, 14, 15.*
 
-### 7. Run Unit & Integration Tests
+### 7. Run Global DeepAR Probabilistic Pipeline
+```bash
+# Default: Full training across all 50 SKUs with 200 Monte Carlo paths
+python3 src/run_deepar_pipeline.py
+
+# Configurable experiment: Custom epochs, learning rate, and samples
+python3 src/run_deepar_pipeline.py --epochs 15 --lr 0.001 --hidden_dim 64 --n_samples 200 --device auto
+
+# Fast test run on subset of series
+python3 src/run_deepar_pipeline.py --n_series 10 --epochs 5 --n_samples 50
+```
+*Trains a unified Global Autoregressive LSTM network across multiple series with static entity embeddings and dynamic calendar/event covariates. Generates 28-day out-of-sample probabilistic forecasts via strictly causal Monte Carlo rollout without ground-truth validation sales, computes MAE, RMSE, WAPE, Pinball losses (P10, P50, P90), and 80% prediction interval coverage (91.79%), and renders publication-grade figures.*
+
+### 8. Run Unit & Integration Tests
 ```bash
 pytest tests/ -v
 ```
-*Runs the full 21-test suite validating feature engineering (lags, leak-free rolling, continuous daily date indexing, calendar features), baseline forecasting (zero-leakage verification, WAPE edge cases, recursive rollout), and Kalman filter dynamics (exact 28-day horizon, non-negative clipping, missing observation predict-only handling, zero-demand preservation, and interval calibration).*
+*Runs the full 30-test suite across 4 test modules:*
+- `test_feature_engineering.py` (9 tests): Lags, leak-free rolling, continuous daily date indexing, calendar features, split integrity.
+- `test_baseline_models.py` (5 tests): Seasonal-Naive persistence, GBDT recursive rollout, zero-leakage proof, safe WAPE.
+- `test_kalman_filter.py` (7 tests): 28-day horizon, non-negative clipping, missing observation predict-only handling, zero-demand preservation, and interval calibration.
+- `test_deepar_model.py` (9 tests): Horizon length, tensor shapes, non-negative clipping, quantile monotonicity (P10 <= P50 <= P90), zero validation leakage, pinball loss precision, interval metrics, short-series padding, and integration.
 
-### 8. Open the Separate Interactive Notebooks
+### 9. Open the Separate Interactive Notebooks
 ```bash
 # Data Cleaning & Ingestion
 jupyter notebook notebooks/01_data_cleaning.ipynb
@@ -245,26 +274,25 @@ jupyter notebook notebooks/02_exploratory_data_analysis.ipynb
 - **Leak-Free Warmup**: Initial 28 days with uncomputable lags/rolling statistics are trimmed for model-ready training without altering original demand observations.
 - **Strict Time Splitting**: Time series observations are never randomly shuffled or randomly split.
 
-## 📈 Three-Way Forecasting Benchmark: Baselines vs Kalman Filter per SKU
+---
+
+## 📈 Four-Way Forecasting Benchmark: Baselines vs Kalman Filter vs Global DeepAR
 
 All models are evaluated on **identical product-store series (50 SKUs), identical dates, and an identical 28-day out-of-sample forecast horizon (2016-03-28 to 2016-04-24)**:
 
-| Model Architecture | MAE (Units) | RMSE (Units) | WAPE (%) | Best Metric Identified | Uncertainty Quantification |
-| :--- | :---: | :---: | :---: | :--- | :--- |
-| **Seasonal-Naive (7-day Persistence)** | 1.1143 | 2.6030 | 95.59% | Baseline Reference | Deterministic point only |
-| **GBDT Regression (LightGBM Recursive)** | 0.9512 | **2.2679** | 81.60% | **Lowest RMSE (2.2679)** | Deterministic recursive rollout |
-| **Kalman Filter per SKU (Local Level + Seasonality)** | **0.9333** | 2.3303 | **80.06%** | **Lowest MAE (0.9333) & WAPE (80.06%)** | **Exact Analytic Covariance $P_t$** |
+| Model Architecture | MAE (Units) | RMSE (Units) | WAPE (%) | Mean Pinball Loss | 80% CI Coverage | Uncertainty Protocol |
+| :--- | :---: | :---: | :---: | :---: | :---: | :--- |
+| **Seasonal-Naive (7-day Persistence)** | 1.1143 | 2.6030 | 95.59% | - | - | Deterministic weekly persistence |
+| **GBDT (Recursive LightGBM)** | 0.9512 | 2.2679 | 81.60% | - | - | Deterministic recursive rollout |
+| **Kalman Filter per SKU (Local Level + Seasonality)** | **0.9333** | 2.3303 | **80.06%** | - | 80.93% | Exact closed-form covariance $\mathbf{P}_t$ |
+| **Global DeepAR (Autoregressive LSTM)** | 1.0416 | **2.2221** | 89.35% | **0.3194** | **91.79%** | **Monte Carlo Quantile Rollout** |
 
 ### Benchmark Key Takeaways:
-- **Best MAE & WAPE: Kalman Filter per SKU**: Achieves the portfolio's top performance with **0.9333 MAE** and **80.06% WAPE**, outperforming both GBDT and Seasonal-Naive.
-- **Best RMSE: GBDT (LightGBM)**: Yields the lowest RMSE (**2.2679** vs Kalman's **2.3303**), driven by tree ensembles' quadratic loss penalization of peak demand spikes.
-- **Calibrated Prediction Intervals**: Kalman Filter generates closed-form recursive state covariance propagation $\mathbf{P}_{T+h|T}$:
-  - **95% Confidence Interval Coverage**: **90.07%** (average interval width: **3.14 units**).
-  - **80% Confidence Interval Coverage**: **80.93%** (average interval width: **2.30 units**).
-
-### 🔮 Strategic Bridge to Global DeepAR Models:
-1. **Local State vs Global Pattern Sharing**: While Kalman filtering effectively isolates and tracks individual SKU levels and weekly harmonics without feature engineering, it does not share statistical strength across sparse cold-start products. **Global DeepAR** addresses this via shared recurrent neural networks trained globally across all series.
-2. **Intermittent Zero-Inflation**: Over 57% of validation observations are zero demand. **Global DeepAR** will model count and zero-inflated distributions (Negative Binomial, Zero-Inflated Poisson) natively, complementing Kalman filter linear state-space estimation.
+- **Lowest RMSE: Global DeepAR (2.2221)**: Achieves the best RMSE across the entire portfolio, surpassing GBDT (2.2679), Kalman Filter (2.3303), and Seasonal-Naive (2.6030) due to its shared recurrent representation penalizing extreme deviations while generalizing across sparse series.
+- **Lowest MAE & WAPE: Kalman Filter per SKU (0.9333 MAE, 80.06% WAPE)**: Structural local level and weekly harmonic state updates adapt rapidly to individual SKU shifts without suffering from recursive variance dampening.
+- **Calibrated Prediction Intervals**:
+  - Kalman Filter (Analytical Covariance): **80.93% coverage** at 80% CI (width: 2.30 units); **90.07% coverage** at 95% CI (width: 3.14 units).
+  - Global DeepAR (Monte Carlo Quantile Rollout): **91.79% coverage** at 80% CI (width: 3.20 units); Mean Pinball Loss: **0.3194** ($P_{10}=0.1116, P_{50}=0.5208, P_{90}=0.3258$).
 
 ---
 
@@ -277,9 +305,10 @@ All models are evaluated on **identical product-store series (50 SKUs), identica
 | **Feature Engineering** | Causal lags, shift(1) rolling, cyclical, SNAP, 28d split | `src/feature_engineering.py`, `src/run_feature_pipeline.py` |
 | **AML Baseline Forecasting** | Seasonal-Naive, GBDT recursive rollout, zero leakage | `src/baseline_models.py`, `src/run_baseline_pipeline.py`, `reports/baseline_findings.md` |
 | **Kalman Filter Forecasting** | Local Level + Weekly Seasonality per SKU, analytic intervals | `src/kalman_filter_model.py`, `src/run_kalman_pipeline.py`, `reports/kalman_findings.md` |
-| **Visualizations** | 15 Publication-grade 300 DPI figures | `reports/figures/`, `src/visualization.py`, `src/kalman_visualization.py` |
-| **Theoretical Rigor & Methodology**| Mathematical justification for Kalman Filters & DeepAR | `reports/eda_findings.md`, `reports/kalman_findings.md` |
-| **Testing & Reproducibility** | Full 21-test pytest suite, zero target leakage proof | `tests/test_feature_engineering.py`, `tests/test_baseline_models.py`, `tests/test_kalman_filter.py` |
+| **Global DeepAR Forecasting** | Autoregressive LSTM, scale normalization, Monte Carlo rollout | `src/deepar_model.py`, `src/run_deepar_pipeline.py`, `reports/deepar_findings.md` |
+| **Visualizations** | 18 Publication-grade 300 DPI figures | `reports/figures/`, `src/visualization.py`, `src/kalman_visualization.py`, `src/deepar_visualization.py` |
+| **Theoretical Rigor & Methodology**| Mathematical formulation for Kalman Filters & DeepAR | `reports/eda_findings.md`, `reports/kalman_findings.md`, `reports/deepar_findings.md` |
+| **Testing & Reproducibility** | Full 30-test pytest suite, zero target leakage proofs | `tests/test_feature_engineering.py`, `tests/test_baseline_models.py`, `tests/test_kalman_filter.py`, `tests/test_deepar_model.py` |
 
 ---
 *Created for CSAI Student Project 5 - Phase 1 Submission.*

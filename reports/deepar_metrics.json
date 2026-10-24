@@ -1,0 +1,418 @@
+{
+  "evaluation_timestamp": "2026-10-24T11:16:39Z",
+  "validation_horizon_days": 28,
+  "validation_date_range": [
+    "2016-03-28",
+    "2016-04-24"
+  ],
+  "total_series": 50,
+  "total_validation_observations": 1400,
+  "model_configuration": {
+    "architecture": "Global Autoregressive LSTM (DeepAR)",
+    "distribution": "gaussian",
+    "hidden_dim": 64,
+    "num_layers": 2,
+    "dropout": 0.1,
+    "learning_rate": 0.001,
+    "batch_size": 64,
+    "epochs": 15,
+    "context_length": 56,
+    "prediction_length": 28,
+    "stride": 14,
+    "n_samples": 200,
+    "device": "mps",
+    "random_seed": 42,
+    "item_scale_normalization": "nu_i = 1.0 + mean(y_i)",
+    "non_negative_clipping": "max(0.0, y)",
+    "zero_leakage_guarantee": "strict_causal_monte_carlo_rollout"
+  },
+  "overall_metrics": {
+    "deepar": {
+      "mae": 0.9928,
+      "rmse": 2.2082,
+      "wape": 0.8516,
+      "sum_actual": 1632.0,
+      "sum_abs_err": 1389.85,
+      "count": 1400,
+      "pinball_loss": {
+        "p10": 0.1126,
+        "p50": 0.4964,
+        "p90": 0.3136,
+        "mean": 0.3075
+      },
+      "prediction_intervals": {
+        "ci_80": {
+          "coverage": 0.9007,
+          "mean_width": 2.8712,
+          "inside_count": 1261,
+          "total_count": 1400
+        }
+      }
+    },
+    "baseline_benchmarks": {
+      "seasonal_naive": {
+        "mae": 1.1143,
+        "rmse": 2.603,
+        "wape": 0.9559,
+        "sum_actual": 1632.0,
+        "sum_abs_err": 1560.0,
+        "count": 1400
+      },
+      "gbdt_recursive": {
+        "mae": 0.9512,
+        "rmse": 2.2679,
+        "wape": 0.816,
+        "sum_actual": 1632.0,
+        "sum_abs_err": 1331.67,
+        "count": 1400
+      },
+      "kalman_filter": {
+        "mae": 0.9333,
+        "rmse": 2.3303,
+        "wape": 0.8006,
+        "sum_actual": 1632.0,
+        "sum_abs_err": 1306.58,
+        "count": 1400,
+        "prediction_intervals": {
+          "ci_95": {
+            "coverage": 0.9007,
+            "mean_width": 3.1428,
+            "inside_count": 1261,
+            "total_count": 1400
+          },
+          "ci_80": {
+            "coverage": 0.8093,
+            "mean_width": 2.2955,
+            "inside_count": 1133,
+            "total_count": 1400
+          }
+        }
+      }
+    },
+    "relative_improvements": {
+      "vs_seasonal_naive": {
+        "mae_reduction_pct": 10.9,
+        "rmse_reduction_pct": 15.17,
+        "wape_reduction_pct": 10.91
+      },
+      "vs_gbdt_recursive": {
+        "mae_reduction_pct": -4.37,
+        "rmse_reduction_pct": 2.63,
+        "wape_reduction_pct": -4.36
+      },
+      "vs_kalman_filter": {
+        "mae_reduction_pct": -6.38,
+        "rmse_reduction_pct": 5.24,
+        "wape_reduction_pct": -6.37
+      }
+    }
+  },
+  "category_breakdown": {
+    "FOODS": {
+      "mae": 1.4373,
+      "rmse": 3.0999,
+      "wape": 0.751,
+      "sum_actual": 1179.0,
+      "sum_abs_err": 885.37,
+      "count": 616,
+      "pinball_loss": {
+        "p10": 0.1826,
+        "p50": 0.7186,
+        "p90": 0.4323,
+        "mean": 0.4445
+      },
+      "prediction_intervals": {
+        "ci_80": {
+          "coverage": 0.9172,
+          "mean_width": 4.4696,
+          "inside_count": 565,
+          "total_count": 616
+        }
+      }
+    },
+    "HOBBIES": {
+      "mae": 0.6574,
+      "rmse": 1.2289,
+      "wape": 1.4317,
+      "sum_actual": 180.0,
+      "sum_abs_err": 257.71,
+      "count": 392,
+      "pinball_loss": {
+        "p10": 0.0459,
+        "p50": 0.3287,
+        "p90": 0.2751,
+        "mean": 0.2166
+      },
+      "prediction_intervals": {
+        "ci_80": {
+          "coverage": 0.8546,
+          "mean_width": 1.3491,
+          "inside_count": 335,
+          "total_count": 392
+        }
+      }
+    },
+    "HOUSEHOLD": {
+      "mae": 0.6295,
+      "rmse": 0.8967,
+      "wape": 0.9039,
+      "sum_actual": 273.0,
+      "sum_abs_err": 246.77,
+      "count": 392,
+      "pinball_loss": {
+        "p10": 0.0694,
+        "p50": 0.3148,
+        "p90": 0.1655,
+        "mean": 0.1832
+      },
+      "prediction_intervals": {
+        "ci_80": {
+          "coverage": 0.9209,
+          "mean_width": 1.8817,
+          "inside_count": 361,
+          "total_count": 392
+        }
+      }
+    }
+  },
+  "store_breakdown": {
+    "CA_1": {
+      "mae": 2.0554,
+      "rmse": 6.1942,
+      "wape": 0.8923,
+      "sum_actual": 258.0,
+      "sum_abs_err": 230.21,
+      "count": 112,
+      "pinball_loss": {
+        "p10": 0.2273,
+        "p50": 1.0277,
+        "p90": 0.8436,
+        "mean": 0.6995
+      },
+      "prediction_intervals": {
+        "ci_80": {
+          "coverage": 0.9107,
+          "mean_width": 5.0447,
+          "inside_count": 102,
+          "total_count": 112
+        }
+      }
+    },
+    "CA_2": {
+      "mae": 1.3083,
+      "rmse": 2.0094,
+      "wape": 0.5936,
+      "sum_actual": 432.0,
+      "sum_abs_err": 256.43,
+      "count": 196,
+      "pinball_loss": {
+        "p10": 0.1988,
+        "p50": 0.6542,
+        "p90": 0.3496,
+        "mean": 0.4009
+      },
+      "prediction_intervals": {
+        "ci_80": {
+          "coverage": 0.8776,
+          "mean_width": 4.3042,
+          "inside_count": 172,
+          "total_count": 196
+        }
+      }
+    },
+    "CA_3": {
+      "mae": 0.7326,
+      "rmse": 1.0185,
+      "wape": 1.0726,
+      "sum_actual": 153.0,
+      "sum_abs_err": 164.1,
+      "count": 224,
+      "pinball_loss": {
+        "p10": 0.0685,
+        "p50": 0.3663,
+        "p90": 0.2381,
+        "mean": 0.2243
+      },
+      "prediction_intervals": {
+        "ci_80": {
+          "coverage": 0.8884,
+          "mean_width": 1.9547,
+          "inside_count": 199,
+          "total_count": 224
+        }
+      }
+    },
+    "CA_4": {
+      "mae": 0.7489,
+      "rmse": 0.9803,
+      "wape": 1.2787,
+      "sum_actual": 82.0,
+      "sum_abs_err": 104.85,
+      "count": 140,
+      "pinball_loss": {
+        "p10": 0.0599,
+        "p50": 0.3745,
+        "p90": 0.1926,
+        "mean": 0.209
+      },
+      "prediction_intervals": {
+        "ci_80": {
+          "coverage": 0.9214,
+          "mean_width": 2.2348,
+          "inside_count": 129,
+          "total_count": 140
+        }
+      }
+    },
+    "TX_1": {
+      "mae": 1.0652,
+      "rmse": 1.3135,
+      "wape": 0.8522,
+      "sum_actual": 35.0,
+      "sum_abs_err": 29.83,
+      "count": 28,
+      "pinball_loss": {
+        "p10": 0.1243,
+        "p50": 0.5326,
+        "p90": 0.266,
+        "mean": 0.3077
+      },
+      "prediction_intervals": {
+        "ci_80": {
+          "coverage": 0.8571,
+          "mean_width": 2.7527,
+          "inside_count": 24,
+          "total_count": 28
+        }
+      }
+    },
+    "TX_2": {
+      "mae": 0.8664,
+      "rmse": 1.4664,
+      "wape": 0.5332,
+      "sum_actual": 182.0,
+      "sum_abs_err": 97.04,
+      "count": 112,
+      "pinball_loss": {
+        "p10": 0.1518,
+        "p50": 0.4332,
+        "p90": 0.2512,
+        "mean": 0.2787
+      },
+      "prediction_intervals": {
+        "ci_80": {
+          "coverage": 0.9196,
+          "mean_width": 3.6115,
+          "inside_count": 103,
+          "total_count": 112
+        }
+      }
+    },
+    "TX_3": {
+      "mae": 0.8378,
+      "rmse": 1.2188,
+      "wape": 1.8767,
+      "sum_actual": 25.0,
+      "sum_abs_err": 46.92,
+      "count": 56,
+      "pinball_loss": {
+        "p10": 0.0446,
+        "p50": 0.4189,
+        "p90": 0.3276,
+        "mean": 0.2637
+      },
+      "prediction_intervals": {
+        "ci_80": {
+          "coverage": 0.9464,
+          "mean_width": 2.1856,
+          "inside_count": 53,
+          "total_count": 56
+        }
+      }
+    },
+    "WI_1": {
+      "mae": 1.1608,
+      "rmse": 1.9786,
+      "wape": 1.0907,
+      "sum_actual": 149.0,
+      "sum_abs_err": 162.51,
+      "count": 140,
+      "pinball_loss": {
+        "p10": 0.1064,
+        "p50": 0.5804,
+        "p90": 0.4379,
+        "mean": 0.3749
+      },
+      "prediction_intervals": {
+        "ci_80": {
+          "coverage": 0.9214,
+          "mean_width": 3.0988,
+          "inside_count": 129,
+          "total_count": 140
+        }
+      }
+    },
+    "WI_2": {
+      "mae": 0.8288,
+      "rmse": 1.1372,
+      "wape": 0.9806,
+      "sum_actual": 142.0,
+      "sum_abs_err": 139.25,
+      "count": 168,
+      "pinball_loss": {
+        "p10": 0.0845,
+        "p50": 0.4144,
+        "p90": 0.2087,
+        "mean": 0.2359
+      },
+      "prediction_intervals": {
+        "ci_80": {
+          "coverage": 0.9048,
+          "mean_width": 2.2916,
+          "inside_count": 152,
+          "total_count": 168
+        }
+      }
+    },
+    "WI_3": {
+      "mae": 0.7085,
+      "rmse": 1.0208,
+      "wape": 0.9122,
+      "sum_actual": 174.0,
+      "sum_abs_err": 158.71,
+      "count": 224,
+      "pinball_loss": {
+        "p10": 0.0779,
+        "p50": 0.3543,
+        "p90": 0.2029,
+        "mean": 0.2117
+      },
+      "prediction_intervals": {
+        "ci_80": {
+          "coverage": 0.8839,
+          "mean_width": 1.9536,
+          "inside_count": 198,
+          "total_count": 224
+        }
+      }
+    }
+  },
+  "training_losses": [
+    0.8341,
+    0.5551,
+    0.4597,
+    0.4209,
+    0.397,
+    0.3206,
+    0.2854,
+    0.2664,
+    0.2637,
+    0.2226,
+    0.197,
+    0.1822,
+    0.1604,
+    0.1988,
+    0.2401
+  ],
+  "execution_time_seconds": 14.53
+}

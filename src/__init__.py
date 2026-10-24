@@ -16,6 +16,15 @@ from src.kalman_filter_model import (
     compute_prediction_interval_metrics,
 )
 from src.kalman_visualization import M5KalmanVisualizer
+from src.deepar_model import (
+    GlobalDeepARForecaster,
+    GlobalDeepARNet,
+    DeepARDataProcessor,
+    compute_pinball_loss,
+    compute_deepar_probabilistic_metrics,
+)
+from src.deepar_visualization import M5DeepARVisualizer
+from src.run_deepar_pipeline import M5DeepARPipeline
 
 __all__ = [
     "M5FeatureEngineer",
@@ -27,4 +36,11 @@ __all__ = [
     "M5KalmanPipeline",
     "compute_prediction_interval_metrics",
     "M5KalmanVisualizer",
+    "GlobalDeepARForecaster",
+    "GlobalDeepARNet",
+    "DeepARDataProcessor",
+    "compute_pinball_loss",
+    "compute_deepar_probabilistic_metrics",
+    "M5DeepARVisualizer",
+    "M5DeepARPipeline",
 ]

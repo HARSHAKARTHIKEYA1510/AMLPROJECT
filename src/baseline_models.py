@@ -206,6 +206,7 @@ class GBDTForecaster:
                     colsample_bytree=self.colsample_bytree,
                     random_state=self.random_state,
                     verbosity=-1,
+                    n_jobs=1,
                 )
                 self.model_type = "lightgbm"
                 return
