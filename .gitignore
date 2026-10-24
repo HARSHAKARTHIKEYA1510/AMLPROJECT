@@ -38,23 +38,9 @@ venv.bak/
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints
 
-# Large datasets exceeding GitHub's 100 MB limit
-data/raw/sell_prices.csv
-data/raw/sales_train_validation.csv
-data/raw/sales_train_evaluation.csv
-data/processed/cleaned_sell_prices.csv
-data/processed/cleaned_sales_train_validation.csv
-data/processed/cleaned_sales_train_evaluation.csv
+# Large datasets are tracked via Git LFS (see .gitattributes)
 data/raw/*.zip
 *.parquet
-
-# Allow smaller raw and cleaned data files
-!data/raw/calendar.csv
-!data/raw/sample_submission.csv
-!data/processed/cleaned_calendar.csv
-!data/processed/cleaned_sample_submission.csv
-!data/raw/.gitkeep
-!data/processed/.gitkeep
 
 # Personal viva study notes (excluded from GitHub push)
 reports/viva_preparation_guide.md
