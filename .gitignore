@@ -38,10 +38,12 @@ venv.bak/
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints
 
-# Large raw datasets exceeding GitHub's 100 MB limit
+# Large datasets exceeding GitHub's 100 MB limit
 data/raw/sell_prices.csv
 data/raw/sales_train_validation.csv
 data/raw/sales_train_evaluation.csv
+data/processed/cleaned_prices.csv
+data/processed/cleaned_sales_matrix.csv
 data/raw/*.zip
 
 # Allow smaller raw files and all processed data

@@ -238,48 +238,62 @@ class M5DataCleaner:
 
         # 1. Clean Calendar
         clean_cal = self.clean_calendar(df_cal)
-        cal_out = self.processed_dir / "cleaned_calendar.parquet"
-        clean_cal.to_parquet(cal_out, index=False)
-        print(f"[SAVED] Cleaned Calendar -> {cal_out.name} ({clean_cal.shape})")
+        cal_csv = self.processed_dir / "cleaned_calendar.csv"
+        cal_parquet = self.processed_dir / "cleaned_calendar.parquet"
+        clean_cal.to_csv(cal_csv, index=False)
+        clean_cal.to_parquet(cal_parquet, index=False)
+        print(f"[SAVED] Cleaned Calendar -> {cal_csv.name} & .parquet ({clean_cal.shape})")
 
-        # 2. Clean Prices
+        # 2. Clean Prices (Full CSV + Preview Sample CSV + Parquet)
         clean_prices = self.clean_prices(df_prices)
-        prices_out = self.processed_dir / "cleaned_prices.parquet"
-        clean_prices.to_parquet(prices_out, index=False)
-        print(f"[SAVED] Cleaned Prices -> {prices_out.name} ({clean_prices.shape})")
+        prices_csv = self.processed_dir / "cleaned_prices.csv"
+        prices_sample_csv = self.processed_dir / "cleaned_prices_sample.csv"
+        prices_parquet = self.processed_dir / "cleaned_prices.parquet"
+        clean_prices.to_csv(prices_csv, index=False)
+        clean_prices.head(5000).to_csv(prices_sample_csv, index=False)
+        clean_prices.to_parquet(prices_parquet, index=False)
+        print(f"[SAVED] Cleaned Prices -> {prices_csv.name} & sample ({clean_prices.shape})")
 
         # 3. Analyze Lifecycle & Cold Starts
         sku_meta = self.analyze_lifecycle_and_stockouts(df_sales)
-        meta_out = self.processed_dir / "sku_lifecycle_metadata.parquet"
-        sku_meta.to_parquet(meta_out, index=False)
-        print(f"[SAVED] SKU Lifecycle Metadata -> {meta_out.name} ({sku_meta.shape})")
+        meta_csv = self.processed_dir / "sku_lifecycle_metadata.csv"
+        meta_parquet = self.processed_dir / "sku_lifecycle_metadata.parquet"
+        sku_meta.to_csv(meta_csv, index=False)
+        sku_meta.to_parquet(meta_parquet, index=False)
+        print(f"[SAVED] SKU Lifecycle Metadata -> {meta_csv.name} & .parquet ({sku_meta.shape})")
 
-        # 4. Clean Sales Matrix & Downcast
+        # 4. Clean Sales Matrix (Full CSV + Preview Sample CSV + Parquet)
         print("[CLEANING] Optimizing sales matrix for processed storage...")
         clean_sales = reduce_mem_usage(df_sales.copy(), verbose=False)
-        sales_out = self.processed_dir / "cleaned_sales_matrix.parquet"
-        clean_sales.to_parquet(sales_out, index=False)
-        print(f"[SAVED] Cleaned Sales Matrix -> {sales_out.name} ({clean_sales.shape})")
+        sales_csv = self.processed_dir / "cleaned_sales_matrix.csv"
+        sales_sample_csv = self.processed_dir / "cleaned_sales_sample.csv"
+        sales_parquet = self.processed_dir / "cleaned_sales_matrix.parquet"
+        clean_sales.to_csv(sales_csv, index=False)
+        clean_sales.head(500).to_csv(sales_sample_csv, index=False)
+        clean_sales.to_parquet(sales_parquet, index=False)
+        print(f"[SAVED] Cleaned Sales Matrix -> {sales_csv.name} & sample ({clean_sales.shape})")
 
         # 5. Build Starter Modeling Panel (CA_1 FOODS_1, 50 SKUs)
         starter_panel = self.build_starter_modeling_subset(
             clean_cal, clean_prices, df_sales, sku_meta,
             store_id="CA_1", dept_id="FOODS_1", max_skus=50
         )
-        starter_out = self.processed_dir / "m5_starter_modeling_panel.parquet"
-        starter_panel.to_parquet(starter_out, index=False)
-        print(f"[SAVED] Starter Modeling Panel -> {starter_out.name} ({starter_panel.shape})")
+        starter_csv = self.processed_dir / "m5_starter_modeling_panel.csv"
+        starter_parquet = self.processed_dir / "m5_starter_modeling_panel.parquet"
+        starter_panel.to_csv(starter_csv, index=False)
+        starter_panel.to_parquet(starter_parquet, index=False)
+        print(f"[SAVED] Starter Modeling Panel -> {starter_csv.name} & .parquet ({starter_panel.shape})")
 
         elapsed = time.time() - start_time
         print(f"\n[DONE] Data Cleaning pipeline completed in {elapsed:.2f} seconds.")
         print(f"Cleaned datasets safely stored in: {self.processed_dir.resolve()}")
 
         return {
-            "calendar_path": str(cal_out),
-            "prices_path": str(prices_out),
-            "sku_meta_path": str(meta_out),
-            "sales_path": str(sales_out),
-            "starter_panel_path": str(starter_out),
+            "calendar_path": str(cal_csv),
+            "prices_path": str(prices_csv),
+            "sku_meta_path": str(meta_csv),
+            "sales_path": str(sales_csv),
+            "starter_panel_path": str(starter_csv),
             "cold_start_skus_count": int(sku_meta["is_cold_start"].sum()),
             "total_skus": len(sku_meta),
         }
