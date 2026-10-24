@@ -53,19 +53,33 @@ def download_file(url: str, output_path: Path, expected_size: int = None) -> Pat
 
     print(f"[DOWNLOADING] {output_path.name} from {url}...")
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
-    req = urllib.request.Request(url, headers=headers)
 
-    with urllib.request.urlopen(req) as response:
-        total_size = int(response.info().get("Content-Length", 0))
-        with open(output_path, "wb") as out_file:
-            with tqdm(total=total_size, unit="B", unit_scale=True, desc=output_path.name) as pbar:
-                chunk_size = 1024 * 1024  # 1MB chunks
-                while True:
-                    chunk = response.read(chunk_size)
-                    if not chunk:
-                        break
-                    out_file.write(chunk)
-                    pbar.update(len(chunk))
+    try:
+        import requests
+        with requests.get(url, stream=True, headers=headers, timeout=60) as response:
+            response.raise_for_status()
+            total_size = int(response.headers.get("content-length", 0))
+            with open(output_path, "wb") as out_file:
+                with tqdm(total=total_size, unit="B", unit_scale=True, desc=output_path.name) as pbar:
+                    for chunk in response.iter_content(chunk_size=1024 * 1024):
+                        if chunk:
+                            out_file.write(chunk)
+                            pbar.update(len(chunk))
+    except Exception as e:
+        # Fallback to urllib if requests fails
+        print(f"[WARN] requests download failed ({e}), attempting urllib fallback...")
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req) as response:
+            total_size = int(response.info().get("Content-Length", 0))
+            with open(output_path, "wb") as out_file:
+                with tqdm(total=total_size, unit="B", unit_scale=True, desc=output_path.name) as pbar:
+                    chunk_size = 1024 * 1024
+                    while True:
+                        chunk = response.read(chunk_size)
+                        if not chunk:
+                            break
+                        out_file.write(chunk)
+                        pbar.update(len(chunk))
 
     print(f"[SUCCESS] Saved {output_path.name} ({output_path.stat().st_size / (1024*1024):.2f} MB)")
     return output_path
@@ -153,13 +167,14 @@ def load_sell_prices(path: str = "data/raw/sell_prices.csv", downcast: bool = Tr
     return df
 
 
-def load_sales_train(path: str = "data/raw/sales_train_validation.csv", downcast: bool = True) -> pd.DataFrame:
+def load_sales_train(path: str = "data/raw/sales_train_validation.csv", downcast: bool = True, nrows: int = None) -> pd.DataFrame:
     """Load and optimize sales_train_validation.csv."""
-    df = pd.read_csv(path)
+    df = pd.read_csv(path, nrows=nrows)
     if downcast:
         cat_cols = ["item_id", "dept_id", "cat_id", "store_id", "state_id"]
         for c in cat_cols:
-            df[c] = df[c].astype("category")
+            if c in df.columns:
+                df[c] = df[c].astype("category")
         df = reduce_mem_usage(df, verbose=False)
     return df
 

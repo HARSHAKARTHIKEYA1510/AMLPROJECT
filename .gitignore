@@ -57,3 +57,4 @@ reports/viva_preparation_guide.md
 .idea/
 *.swp
 *.swo
+data/raw/sales_train_validation.csv

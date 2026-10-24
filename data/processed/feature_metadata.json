@@ -1,0 +1,165 @@
+{
+  "pipeline_timestamp": "2026-10-24T08:51:20Z",
+  "dataset_info": {
+    "total_series_selected": 50,
+    "total_days_historical": 1913,
+    "selected_stores": [
+      "CA_1",
+      "CA_2",
+      "CA_3",
+      "CA_4",
+      "TX_1",
+      "TX_2",
+      "TX_3",
+      "WI_1",
+      "WI_2",
+      "WI_3"
+    ],
+    "selected_categories": [
+      "FOODS",
+      "HOBBIES",
+      "HOUSEHOLD"
+    ],
+    "selected_departments": [
+      "FOODS_1",
+      "FOODS_2",
+      "FOODS_3",
+      "HOBBIES_1",
+      "HOBBIES_2",
+      "HOUSEHOLD_1",
+      "HOUSEHOLD_2"
+    ],
+    "sample_series_ids": [
+      "FOODS_1_138_WI_3_validation",
+      "FOODS_1_022_CA_4_validation",
+      "FOODS_1_132_WI_3_validation",
+      "FOODS_1_035_TX_2_validation",
+      "FOODS_1_143_CA_4_validation"
+    ]
+  },
+  "split_info": {
+    "validation_horizon_days": 28,
+    "train_start_date": "2011-02-26",
+    "train_end_date": "2016-03-27",
+    "val_start_date": "2016-03-28",
+    "val_end_date": "2016-04-24",
+    "train_rows": 92850,
+    "val_rows": 1400,
+    "train_days_count": 1857,
+    "val_days_count": 28,
+    "total_series": 50
+  },
+  "missing_values_audit": {
+    "drop_warmup_applied": true,
+    "max_warmup_days": 28,
+    "rows_before_trimming": 95650,
+    "warmup_rows_dropped": 1400,
+    "rows_after_trimming": 94250,
+    "missing_counts_before": {
+      "lag_1": 50,
+      "lag_7": 350,
+      "lag_28": 1400,
+      "rolling_mean_7": 350,
+      "rolling_std_7": 350,
+      "rolling_mean_28": 1400,
+      "rolling_std_28": 1400
+    },
+    "missing_counts_after": {
+      "lag_1": 0,
+      "lag_7": 0,
+      "lag_28": 0,
+      "rolling_mean_7": 0,
+      "rolling_std_7": 0,
+      "rolling_mean_28": 0,
+      "rolling_std_28": 0
+    }
+  },
+  "temporal_continuity": {
+    "min_date": "2011-01-29",
+    "max_date": "2016-04-24",
+    "expected_days_per_series": 1913,
+    "total_series": 50,
+    "series_with_gaps": [],
+    "total_missing_dates": 0
+  },
+  "feature_engineering": {
+    "target_column": "demand",
+    "id_columns": [
+      "id",
+      "item_id",
+      "dept_id",
+      "cat_id",
+      "store_id",
+      "state_id"
+    ],
+    "date_columns": [
+      "date",
+      "d"
+    ],
+    "lags_computed": [
+      1,
+      7,
+      28
+    ],
+    "rolling_windows_computed": [
+      7,
+      28
+    ],
+    "target_leakage_prevented": true,
+    "all_feature_columns": [
+      "wm_yr_wk",
+      "weekday",
+      "wday",
+      "month",
+      "year",
+      "event_name_1",
+      "event_type_1",
+      "event_name_2",
+      "event_type_2",
+      "snap_CA",
+      "snap_TX",
+      "snap_WI",
+      "lag_1",
+      "lag_7",
+      "lag_28",
+      "rolling_mean_7",
+      "rolling_std_7",
+      "rolling_mean_28",
+      "rolling_std_28",
+      "day_of_week",
+      "day",
+      "is_weekend",
+      "quarter",
+      "week_of_year",
+      "day_sin",
+      "day_cos",
+      "month_sin",
+      "month_cos",
+      "has_event_1",
+      "has_event_2",
+      "is_event_day",
+      "is_christmas",
+      "snap_active"
+    ],
+    "total_feature_count": 33
+  },
+  "data_shapes": {
+    "tidy_full_shape": [
+      95650,
+      42
+    ],
+    "model_ready_shape": [
+      94250,
+      42
+    ],
+    "train_shape": [
+      92850,
+      42
+    ],
+    "val_shape": [
+      1400,
+      42
+    ]
+  },
+  "execution_time_seconds": 3.26
+}

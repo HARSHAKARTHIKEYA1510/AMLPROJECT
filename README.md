@@ -36,12 +36,16 @@ data/
 │   ├── sales_train_evaluation.csv            # Daily sales matrix (extended to day 1941)
 │   └── sample_submission.csv                 # Official forecasting submission template
 │
-└── processed/                                # Exactly 5 Cleaned CSV files (1-to-1 counterpart)
+└── processed/                                # Cleaned CSV files & feature-engineered artifacts
     ├── cleaned_calendar.csv                  # Cyclical encodings (sin/cos), SNAP & holiday markers
     ├── cleaned_sell_prices.csv               # Regular price baselines, discount depth percentages
     ├── cleaned_sales_train_validation.csv    # Cleaned unit sales matrix (days 1 to 1913)
     ├── cleaned_sales_train_evaluation.csv    # Cleaned unit sales matrix (days 1 to 1941)
-    └── cleaned_sample_submission.csv         # Validated submission template
+    ├── cleaned_sample_submission.csv         # Validated submission template
+    ├── train_features.csv                    # Chronological training split (leak-free features)
+    ├── val_features.csv                      # Chronological 28-day validation horizon
+    ├── selected_features_full.csv            # Complete subset feature panel (all 1913 days)
+    └── feature_metadata.json                 # Audit schemas, split dates, and missing-value logs
 ```
 
 ---
@@ -54,7 +58,6 @@ As per requirements, data cleaning and exploratory data analysis are split into 
    * Loading raw CSVs from `data/raw/`.
    * Schema audit, zero-null verification, and memory downcasting.
    * Product lifecycle analysis: identifying pre-launch days vs. active demand.
-   * **Marking stockout periods:** Creating `is_unlisted_stockout` flags rather than imputing zeros.
    * Causal feature engineering: lags ($t-1, 7, 14, 28$) and rolling windows ($7, 28$) without lookahead.
    * Exporting structured tables into `data/processed/`.
 
@@ -75,21 +78,26 @@ As per requirements, data cleaning and exploratory data analysis are split into 
 ```text
 AMLPROJECT/
 ├── README.md                           # Comprehensive documentation & project guide
-├── requirements.txt                    # Project dependencies
+├── requirements.txt                    # Project dependencies (including pytest)
 ├── .gitignore                          # Excludes raw & processed big data (>100MB)
 │
 ├── data/
 │   ├── raw/                            # Raw M5 dataset (calendar, prices, sales)
-│   └── processed/                      # Cleaned CSV tables & starter panel
+│   └── processed/                      # Cleaned CSV tables, feature sets & split metadata
 │
 ├── src/
 │   ├── __init__.py                     # Package init
 │   ├── data_loader.py                  # Automated streaming acquisition & downcasting
 │   ├── data_quality.py                 # Automated data quality audit engine
-│   ├── data_cleaning.py                # Cleaning pipeline, stockout & cold-start markers
+│   ├── data_cleaning.py                # 1-to-1 cleaning pipeline
 │   ├── eda_analysis.py                 # Croston classification, SNAP uplift, ADF, Kalman filter
 │   ├── visualization.py                # 300 DPI publication plotting engine
-│   └── run_eda_pipeline.py             # End-to-end execution script
+│   ├── run_eda_pipeline.py             # End-to-end EDA execution script
+│   ├── feature_engineering.py          # Modular, leak-free feature engineering engine
+│   └── run_feature_pipeline.py         # Configurable CLI feature pipeline runner
+│
+├── tests/
+│   └── test_feature_engineering.py     # Comprehensive unit & integration pytest suite
 │
 ├── notebooks/
 │   ├── 01_data_cleaning.ipynb          # Dedicated Data Cleaning notebook
@@ -134,19 +142,44 @@ Rendered at 300 DPI in `reports/figures/`:
 
 ## 🚀 Execution Guide
 
-### 1. Run Data Cleaning & Feature Generation Pipeline
+### 1. Run Data Ingestion & Streaming (if raw files missing)
+```bash
+python3 src/data_loader.py
+```
+*Downloads the M5 raw datasets directly from the Hugging Face mirror into `data/raw/` with verified checksums.*
+
+### 2. Run Data Cleaning Pipeline
 ```bash
 python3 src/data_cleaning.py
 ```
-*Loads raw data, performs schema checks, creates stockout/cold-start flags, and exports clean CSV tables to `data/processed/` in ~7 seconds.*
+*Loads raw data, performs schema checks, and exports 1-to-1 clean CSV tables to `data/processed/`.*
 
-### 2. Run Full EDA & Visualization Pipeline
+### 3. Run Full EDA & Visualization Pipeline
 ```bash
 python3 src/run_eda_pipeline.py
 ```
-*Computes Croston classification, SNAP effects, stationarity tests, and generates all 9 figures in ~7 seconds.*
+*Computes Croston classification, SNAP effects, stationarity tests, and generates all 9 publication-grade figures in `reports/figures/`.*
 
-### 3. Open the Separate Interactive Notebooks
+### 4. Run Feature Engineering & Train/Val Splitting Pipeline
+```bash
+# Default: 50 diverse series across all 3 categories & 10 stores, 28-day validation horizon
+python3 src/run_feature_pipeline.py
+
+# Custom: 100 series from store CA_1 with specific lags & rolling windows
+python3 src/run_feature_pipeline.py --n_series 100 --store_id CA_1 --val_days 28 --lags 1 7 28 --windows 7 28
+
+# Filter by category and department with top-volume selection
+python3 src/run_feature_pipeline.py --n_series 50 --cat_id FOODS --dept_id FOODS_1 --selection_strategy top_volume
+```
+*Transforms wide sales into tidy long format, verifies daily date index continuity, calculates causal lag (1, 7, 28) and leak-free rolling features (mean, std for 7 and 28 days), constructs calendar, event, and SNAP policy indicators, and saves chronological train/val splits to `data/processed/`.*
+
+### 5. Run Unit & Integration Tests
+```bash
+pytest tests/ -v
+```
+*Runs the full test suite validating series selection, tidy reshaping, date index continuity, lag calculations, zero target leakage in rolling windows, calendar features, original demand integrity, and chronological split boundaries.*
+
+### 6. Open the Separate Interactive Notebooks
 ```bash
 # Data Cleaning & Ingestion
 jupyter notebook notebooks/01_data_cleaning.ipynb
@@ -157,15 +190,38 @@ jupyter notebook notebooks/02_exploratory_data_analysis.ipynb
 
 ---
 
+## 🛠️ Feature Engineering & Causal Formulation
+
+| Category | Features | Construction & Leakage Prevention |
+| :--- | :--- | :--- |
+| **Identifiers** | `id`, `item_id`, `dept_id`, `cat_id`, `store_id`, `state_id` | Preserved unchanged throughout pipeline for hierarchical mapping. |
+| **Target** | `demand` | Pristine daily unit sales. Original observations are never silently mutated or imputed. |
+| **Causal Lags** | `lag_1`, `lag_7`, `lag_28` | Grouped by `id`: $\text{demand}_{t-k}$ strictly using past historical demand. |
+| **Rolling Stats** | `rolling_mean_7`, `rolling_std_7`, `rolling_mean_28`, `rolling_std_28` | **Shift(1) prior to rolling**: Grouped by `id`, demand is shifted by 1 day so day $t$ features only use $\{t-1, \dots, t-W\}$. Mathematically verified to guarantee zero target leakage. |
+| **Calendar Components**| `day_of_week`, `month`, `year`, `day`, `is_weekend`, `quarter`, `week_of_year` | Extracted from daily date timestamps (0 = Monday, 6 = Sunday; weekend flag for Sat/Sun). |
+| **Cyclical Encodings** | `day_sin`, `day_cos`, `month_sin`, `month_cos` | Continuous periodic representation $\sin(2\pi t / T)$ and $\cos(2\pi t / T)$. |
+| **Events & Holidays** | `event_name_1`, `event_type_1`, `has_event_1`, `has_event_2`, `is_event_day`, `is_christmas` | Binary event flags and specialized Walmart Christmas closure marker. |
+| **Policy Indicators** | `snap_active`, `snap_CA`, `snap_TX`, `snap_WI` | `snap_active` dynamically resolves each series' store state to its state-specific SNAP schedule. |
+
+### Chronological Train / Validation Split:
+- **Validation Horizon**: Exactly 28 days per series (`2016-03-28` to `2016-04-24`).
+- **Training Period**: `2011-02-26` to `2016-03-27` (strictly prior to validation start).
+- **Leak-Free Warmup**: Initial 28 days with uncomputable lags/rolling statistics are trimmed for model-ready training without altering original demand observations.
+- **Strict Time Splitting**: Time series observations are never randomly shuffled or randomly split.
+
+---
+
 ## 🎯 Phase 1 Evaluation Alignment
 
 | Evaluation Criteria | Implementation Deliverable | Location in Repository |
 | :--- | :--- | :--- |
 | **Dataset Quality & Ingestion** | Full data audit, memory downcasting, schema validation | `src/data_loader.py`, `src/data_cleaning.py`, `reports/data_quality_report.md` |
 | **Exploratory Data Analysis** | Syntetos-Boylan matrix, SNAP uplift, seasonality | `src/eda_analysis.py`, `reports/eda_findings.md`, `reports/eda_metrics.json` |
+| **Feature Engineering** | Causal lags, shift(1) rolling, cyclical, SNAP, 28d split | `src/feature_engineering.py`, `src/run_feature_pipeline.py` |
 | **Visualizations** | 9 Publication-grade 300 DPI figures | `reports/figures/`, `src/visualization.py` |
 | **Theoretical Rigor & Methodology**| Mathematical justification for Kalman Filters & DeepAR | `reports/eda_findings.md`, Section 5 |
-| **Code Quality & Reproducibility**| Modular package, type hints, PEP 8, git documentation | `src/`, `notebooks/`, and `data/` |
+| **Testing & Reproducibility** | Pytest test suite, zero target leakage proof | `tests/test_feature_engineering.py` |
 
 ---
 *Created for CSAI Student Project 5 - Phase 1 Submission.*
+
