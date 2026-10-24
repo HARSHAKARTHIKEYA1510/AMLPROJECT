@@ -10,6 +10,12 @@ from src.baseline_models import (
     M5BaselinePipeline,
     compute_forecasting_metrics,
 )
+from src.kalman_filter_model import (
+    SKUKalmanForecaster,
+    M5KalmanPipeline,
+    compute_prediction_interval_metrics,
+)
+from src.kalman_visualization import M5KalmanVisualizer
 
 __all__ = [
     "M5FeatureEngineer",
@@ -17,4 +23,8 @@ __all__ = [
     "GBDTForecaster",
     "M5BaselinePipeline",
     "compute_forecasting_metrics",
+    "SKUKalmanForecaster",
+    "M5KalmanPipeline",
+    "compute_prediction_interval_metrics",
+    "M5KalmanVisualizer",
 ]

@@ -1,5 +1,5 @@
 {
-  "evaluation_timestamp": "2026-10-24T09:06:32Z",
+  "evaluation_timestamp": "2026-10-24T10:37:20Z",
   "validation_horizon_days": 28,
   "validation_date_range": [
     "2016-03-28",
@@ -245,5 +245,5 @@
       "gbdt_wape": 0.842
     }
   ],
-  "execution_time_seconds": 1.48
+  "execution_time_seconds": 1.0
 }
