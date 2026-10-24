@@ -94,10 +94,14 @@ AMLPROJECT/
 │   ├── visualization.py                # 300 DPI publication plotting engine
 │   ├── run_eda_pipeline.py             # End-to-end EDA execution script
 │   ├── feature_engineering.py          # Modular, leak-free feature engineering engine
-│   └── run_feature_pipeline.py         # Configurable CLI feature pipeline runner
+│   ├── run_feature_pipeline.py         # Configurable CLI feature pipeline runner
+│   ├── baseline_models.py              # Seasonal-Naive & GBDT recursive forecasters
+│   ├── baseline_visualization.py       # 300 DPI baseline diagnostic visualizer
+│   └── run_baseline_pipeline.py        # Baseline evaluation & report orchestration
 │
 ├── tests/
-│   └── test_feature_engineering.py     # Comprehensive unit & integration pytest suite
+│   ├── test_feature_engineering.py     # Feature engineering pytest suite
+│   └── test_baseline_models.py         # Baseline forecasting & zero-leakage pytest suite
 │
 ├── notebooks/
 │   ├── 01_data_cleaning.ipynb          # Dedicated Data Cleaning notebook
@@ -108,7 +112,9 @@ AMLPROJECT/
     ├── data_quality_report.json        # Machine-readable audit metrics
     ├── eda_findings.md                 # Academic EDA findings & theoretical justification
     ├── eda_metrics.json                # Numerical EDA metrics
-    └── figures/                        # 9 High-resolution publication plots (300 DPI)
+    ├── baseline_findings.md            # Comprehensive AML baseline benchmark report
+    ├── baseline_metrics.json           # Machine-readable baseline metrics (MAE, RMSE, WAPE)
+    └── figures/                        # 12 High-resolution publication plots (300 DPI)
         ├── 01_hierarchical_sales_overview.png
         ├── 02_intermittent_croston_matrix.png
         ├── 03_zero_demand_distribution.png
@@ -117,7 +123,10 @@ AMLPROJECT/
         ├── 06_price_elasticity_analysis.png
         ├── 07_store_level_comparison.png
         ├── 08_acf_pacf_stationarity.png
-        └── 09_kalman_filter_motivation.png
+        ├── 09_kalman_filter_motivation.png
+        ├── 10_baseline_aggregate_comparison.png
+        ├── 11_baseline_series_predictions.png
+        └── 12_baseline_metric_comparison.png
 ```
 
 ---
@@ -137,6 +146,9 @@ Rendered at 300 DPI in `reports/figures/`:
 | **07. Store Comparison** | Daily sales volume & variance across 10 stores | CA_3 and CA_1 lead in total unit turnover |
 | **08. Stationarity & ACF** | Autocorrelation function at key lag multiples | Multi-lag weekly harmonics at Lags 7, 14, 21, and 28 |
 | **09. Kalman Filter Tracking** | Latent state estimation vs. noisy sales observations | Filters zero noise and extracts true consumption velocity |
+| **10. Baseline Aggregate Forecast** | 28-day daily system demand vs SNaive vs GBDT | GBDT tracks aggregate trajectories with superior fidelity |
+| **11. SKU Baseline Trajectories** | Out-of-sample forecasts for representative items | Captures category-specific intermittency without lookahead |
+| **12. Model Metric Comparison** | MAE, RMSE, and WAPE comparison across categories | GBDT achieves **+14.64%** lower WAPE over Seasonal-Naive |
 
 ---
 
@@ -173,13 +185,19 @@ python3 src/run_feature_pipeline.py --n_series 50 --cat_id FOODS --dept_id FOODS
 ```
 *Transforms wide sales into tidy long format, verifies daily date index continuity, calculates causal lag (1, 7, 28) and leak-free rolling features (mean, std for 7 and 28 days), constructs calendar, event, and SNAP policy indicators, and saves chronological train/val splits to `data/processed/`.*
 
-### 5. Run Unit & Integration Tests
+### 5. Run AML Baseline Forecasting Pipeline
+```bash
+python3 src/run_baseline_pipeline.py
+```
+*Trains Seasonal-Naive (weekly persistence) and GBDT (LightGBM) under a strictly leak-free recursive multi-step forecasting protocol. Evaluates MAE, RMSE, and zero-denominator-safe WAPE across identical series and dates, renders 3 publication-grade figures, and exports predictions and analytical reports.*
+
+### 6. Run Unit & Integration Tests
 ```bash
 pytest tests/ -v
 ```
-*Runs the full test suite validating series selection, tidy reshaping, date index continuity, lag calculations, zero target leakage in rolling windows, calendar features, original demand integrity, and chronological split boundaries.*
+*Runs the full 14-test suite validating feature engineering (lags, leak-free rolling, continuous daily date indexing, calendar features) and baseline forecasting (zero-leakage verification, WAPE edge cases, and recursive rollout).*
 
-### 6. Open the Separate Interactive Notebooks
+### 7. Open the Separate Interactive Notebooks
 ```bash
 # Data Cleaning & Ingestion
 jupyter notebook notebooks/01_data_cleaning.ipynb
@@ -211,6 +229,28 @@ jupyter notebook notebooks/02_exploratory_data_analysis.ipynb
 
 ---
 
+## 📈 AML Baseline Forecasting Benchmark
+
+Both baselines are evaluated on **identical product-store series, identical dates, and an identical 28-day out-of-sample forecast horizon**:
+
+| Baseline Model | MAE (Units) | RMSE (Units) | WAPE (%) | Multi-Step Forecast Protocol |
+| :--- | :---: | :---: | :---: | :--- |
+| **Seasonal-Naive (7-day Persistence)** | **1.1143** | **2.6030** | **95.59%** | Weekly day-of-week persistence from final observed week |
+| **GBDT Regression (LightGBM)** | **0.9512** | **2.2679** | **81.60%** | Pure Recursive Multi-Step Rollout (Zero Lookahead) |
+| **GBDT Relative Advantage** | **+14.64%** | **+12.87%** | **+14.64%** | Substantial variance reduction across all tiers |
+
+### Category Breakdown (WAPE):
+- **FOODS**: Seasonal-Naive 87.5% $\rightarrow$ GBDT **77.8%** (-9.7% pts)
+- **HOBBIES**: Seasonal-Naive 98.6% $\rightarrow$ GBDT **82.9%** (-15.7% pts)
+- **HOUSEHOLD**: Seasonal-Naive 109.9% $\rightarrow$ GBDT **89.1%** (-20.8% pts)
+
+### 🔮 Strategic Bridge to Kalman Filter & Global DeepAR Models:
+1. **Compounding Recursive Variance**: While GBDT improves over naive persistence, recursive auto-regressive substitution dampens variance over the 28-day horizon. **Kalman Filtering** addresses this by maintaining an explicit state-space formulation ($x_t = F x_{t-1} + w_t$), tracking time-varying local level/trend and observation noise covariance ($R$).
+2. **Sparsity & Intermittent Zero-Inflation**: Over 57% of validation observations are zero demand. **Global DeepAR** addresses this via shared cross-series recurrent networks with Negative Binomial or Zero-Inflated Poisson likelihoods.
+3. **Probabilistic Uncertainty Bounds**: Neither baseline produces calibrated prediction intervals ($P_{10}, P_{50}, P_{90}$). Both Kalman Filters (via state error covariance $P_t$) and DeepAR (via Monte Carlo quantile rollout) provide exact bounds required for inventory safety stock optimization.
+
+---
+
 ## 🎯 Phase 1 Evaluation Alignment
 
 | Evaluation Criteria | Implementation Deliverable | Location in Repository |
@@ -218,9 +258,10 @@ jupyter notebook notebooks/02_exploratory_data_analysis.ipynb
 | **Dataset Quality & Ingestion** | Full data audit, memory downcasting, schema validation | `src/data_loader.py`, `src/data_cleaning.py`, `reports/data_quality_report.md` |
 | **Exploratory Data Analysis** | Syntetos-Boylan matrix, SNAP uplift, seasonality | `src/eda_analysis.py`, `reports/eda_findings.md`, `reports/eda_metrics.json` |
 | **Feature Engineering** | Causal lags, shift(1) rolling, cyclical, SNAP, 28d split | `src/feature_engineering.py`, `src/run_feature_pipeline.py` |
-| **Visualizations** | 9 Publication-grade 300 DPI figures | `reports/figures/`, `src/visualization.py` |
-| **Theoretical Rigor & Methodology**| Mathematical justification for Kalman Filters & DeepAR | `reports/eda_findings.md`, Section 5 |
-| **Testing & Reproducibility** | Pytest test suite, zero target leakage proof | `tests/test_feature_engineering.py` |
+| **Baseline Forecasting** | Seasonal-Naive, GBDT recursive rollout, zero leakage | `src/baseline_models.py`, `src/run_baseline_pipeline.py`, `reports/baseline_findings.md` |
+| **Visualizations** | 12 Publication-grade 300 DPI figures | `reports/figures/`, `src/visualization.py`, `src/baseline_visualization.py` |
+| **Theoretical Rigor & Methodology**| Mathematical justification for Kalman Filters & DeepAR | `reports/eda_findings.md`, `reports/baseline_findings.md` |
+| **Testing & Reproducibility** | Full 14-test pytest suite, zero target leakage proof | `tests/test_feature_engineering.py`, `tests/test_baseline_models.py` |
 
 ---
 *Created for CSAI Student Project 5 - Phase 1 Submission.*

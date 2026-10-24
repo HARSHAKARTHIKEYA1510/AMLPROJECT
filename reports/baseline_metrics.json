@@ -1,0 +1,249 @@
+{
+  "evaluation_timestamp": "2026-10-24T09:06:32Z",
+  "validation_horizon_days": 28,
+  "validation_date_range": [
+    "2016-03-28",
+    "2016-04-24"
+  ],
+  "total_series": 50,
+  "total_validation_observations": 1400,
+  "overall_metrics": {
+    "seasonal_naive": {
+      "mae": 1.1143,
+      "rmse": 2.603,
+      "wape": 0.9559,
+      "sum_actual": 1632.0,
+      "sum_abs_err": 1560.0,
+      "count": 1400
+    },
+    "gbdt_recursive": {
+      "mae": 0.9512,
+      "rmse": 2.2679,
+      "wape": 0.816,
+      "sum_actual": 1632.0,
+      "sum_abs_err": 1331.67,
+      "count": 1400
+    },
+    "gbdt_relative_improvements": {
+      "mae_reduction_pct": 14.64,
+      "rmse_reduction_pct": 12.87,
+      "wape_reduction_pct": 14.64
+    }
+  },
+  "category_breakdown": {
+    "FOODS": {
+      "seasonal_naive": {
+        "mae": 1.7094,
+        "rmse": 3.6331,
+        "wape": 0.8931,
+        "sum_actual": 1179.0,
+        "sum_abs_err": 1053.0,
+        "count": 616
+      },
+      "gbdt": {
+        "mae": 1.3737,
+        "rmse": 3.1999,
+        "wape": 0.7177,
+        "sum_actual": 1179.0,
+        "sum_abs_err": 846.21,
+        "count": 616
+      }
+    },
+    "HOBBIES": {
+      "seasonal_naive": {
+        "mae": 0.5867,
+        "rmse": 1.3054,
+        "wape": 1.2778,
+        "sum_actual": 180.0,
+        "sum_abs_err": 230.0,
+        "count": 392
+      },
+      "gbdt": {
+        "mae": 0.6176,
+        "rmse": 1.2139,
+        "wape": 1.3449,
+        "sum_actual": 180.0,
+        "sum_abs_err": 242.09,
+        "count": 392
+      }
+    },
+    "HOUSEHOLD": {
+      "seasonal_naive": {
+        "mae": 0.7066,
+        "rmse": 1.3238,
+        "wape": 1.0147,
+        "sum_actual": 273.0,
+        "sum_abs_err": 277.0,
+        "count": 392
+      },
+      "gbdt": {
+        "mae": 0.6208,
+        "rmse": 0.8977,
+        "wape": 0.8915,
+        "sum_actual": 273.0,
+        "sum_abs_err": 243.37,
+        "count": 392
+      }
+    }
+  },
+  "feature_importances_top_10": {
+    "rolling_mean_28": 0.1282,
+    "rolling_mean_7": 0.1009,
+    "rolling_std_7": 0.0984,
+    "lag_1": 0.0905,
+    "item_id": 0.081,
+    "rolling_std_28": 0.075,
+    "wm_yr_wk": 0.0636,
+    "lag_7": 0.0506,
+    "lag_28": 0.0465,
+    "day": 0.0389
+  },
+  "model_configurations": {
+    "seasonal_naive": {
+      "season_length": 7,
+      "multi_step_strategy": "day_of_week_persistence"
+    },
+    "gbdt": {
+      "library": "lightgbm",
+      "n_estimators": 120,
+      "learning_rate": 0.05,
+      "num_leaves": 31,
+      "max_depth": 6,
+      "multi_step_strategy": "recursive_auto_regressive",
+      "features_count": 37
+    }
+  },
+  "sample_series_metrics": [
+    {
+      "id": "FOODS_1_022_CA_4_validation",
+      "cat_id": "FOODS",
+      "store_id": "CA_4",
+      "total_demand": 0.0,
+      "zero_demand_days": 28,
+      "snaive_mae": 0.0,
+      "snaive_rmse": 0.0,
+      "snaive_wape": 0.0,
+      "gbdt_mae": 0.2008,
+      "gbdt_rmse": 0.2027,
+      "gbdt_wape": null
+    },
+    {
+      "id": "FOODS_1_035_TX_2_validation",
+      "cat_id": "FOODS",
+      "store_id": "TX_2",
+      "total_demand": 9.0,
+      "zero_demand_days": 21,
+      "snaive_mae": 0.6071,
+      "snaive_rmse": 0.866,
+      "snaive_wape": 1.8889,
+      "gbdt_mae": 0.547,
+      "gbdt_rmse": 0.6353,
+      "gbdt_wape": 1.7019
+    },
+    {
+      "id": "FOODS_1_054_WI_2_validation",
+      "cat_id": "FOODS",
+      "store_id": "WI_2",
+      "total_demand": 30.0,
+      "zero_demand_days": 14,
+      "snaive_mae": 1.0714,
+      "snaive_rmse": 1.4392,
+      "snaive_wape": 1.0,
+      "gbdt_mae": 1.0503,
+      "gbdt_rmse": 1.3216,
+      "gbdt_wape": 0.9803
+    },
+    {
+      "id": "FOODS_1_132_WI_3_validation",
+      "cat_id": "FOODS",
+      "store_id": "WI_3",
+      "total_demand": 19.0,
+      "zero_demand_days": 15,
+      "snaive_mae": 1.25,
+      "snaive_rmse": 1.6147,
+      "snaive_wape": 1.8421,
+      "gbdt_mae": 0.732,
+      "gbdt_rmse": 0.9646,
+      "gbdt_wape": 1.0788
+    },
+    {
+      "id": "FOODS_1_138_WI_3_validation",
+      "cat_id": "FOODS",
+      "store_id": "WI_3",
+      "total_demand": 6.0,
+      "zero_demand_days": 22,
+      "snaive_mae": 0.2143,
+      "snaive_rmse": 0.4629,
+      "snaive_wape": 1.0,
+      "gbdt_mae": 0.3429,
+      "gbdt_rmse": 0.4009,
+      "gbdt_wape": 1.6004
+    },
+    {
+      "id": "FOODS_1_143_CA_4_validation",
+      "cat_id": "FOODS",
+      "store_id": "CA_4",
+      "total_demand": 28.0,
+      "zero_demand_days": 12,
+      "snaive_mae": 1.0714,
+      "snaive_rmse": 1.6036,
+      "snaive_wape": 1.0714,
+      "gbdt_mae": 0.8947,
+      "gbdt_rmse": 1.1969,
+      "gbdt_wape": 0.8947
+    },
+    {
+      "id": "FOODS_1_163_WI_1_validation",
+      "cat_id": "FOODS",
+      "store_id": "WI_1",
+      "total_demand": 46.0,
+      "zero_demand_days": 8,
+      "snaive_mae": 2.0,
+      "snaive_rmse": 2.6458,
+      "snaive_wape": 1.2174,
+      "gbdt_mae": 1.4628,
+      "gbdt_rmse": 1.9153,
+      "gbdt_wape": 0.8904
+    },
+    {
+      "id": "FOODS_2_011_CA_2_validation",
+      "cat_id": "FOODS",
+      "store_id": "CA_2",
+      "total_demand": 32.0,
+      "zero_demand_days": 14,
+      "snaive_mae": 1.6429,
+      "snaive_rmse": 2.3299,
+      "snaive_wape": 1.4375,
+      "gbdt_mae": 1.1259,
+      "gbdt_rmse": 1.4868,
+      "gbdt_wape": 0.9851
+    },
+    {
+      "id": "FOODS_2_140_WI_2_validation",
+      "cat_id": "FOODS",
+      "store_id": "WI_2",
+      "total_demand": 67.0,
+      "zero_demand_days": 3,
+      "snaive_mae": 1.75,
+      "snaive_rmse": 2.2756,
+      "snaive_wape": 0.7313,
+      "gbdt_mae": 1.2016,
+      "gbdt_rmse": 1.5418,
+      "gbdt_wape": 0.5022
+    },
+    {
+      "id": "FOODS_2_142_TX_1_validation",
+      "cat_id": "FOODS",
+      "store_id": "TX_1",
+      "total_demand": 35.0,
+      "zero_demand_days": 10,
+      "snaive_mae": 1.1786,
+      "snaive_rmse": 1.6147,
+      "snaive_wape": 0.9429,
+      "gbdt_mae": 1.0525,
+      "gbdt_rmse": 1.311,
+      "gbdt_wape": 0.842
+    }
+  ],
+  "execution_time_seconds": 1.48
+}
