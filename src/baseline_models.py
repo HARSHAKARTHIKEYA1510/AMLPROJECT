@@ -565,3 +565,10 @@ class M5BaselinePipeline:
             "metrics_snaive": metrics_snaive,
             "metrics_gbdt": metrics_gbdt,
         }
+
+        # return {
+        #     "results_df": results_df,
+        #     "metadata": metadata,
+        #     "metrics_snaive": metrics_snaive,
+        #     "metrics_gbdt": metrics_gbdt,
+        # }
