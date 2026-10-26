@@ -55,21 +55,23 @@ data/
 As per requirements, data cleaning and exploratory data analysis are split into two dedicated, interactive notebooks in [`notebooks/`](notebooks/):
 
 1. **[`01_data_cleaning.ipynb`](notebooks/01_data_cleaning.ipynb)**:
-   * Loading raw CSVs from `data/raw/`.
-   * Schema audit, zero-null verification, and memory downcasting.
-   * Product lifecycle analysis: identifying pre-launch days vs. active demand.
-   * Causal feature engineering: lags ($t-1, 7, 14, 28$) and rolling windows ($7, 28$) without lookahead.
-   * Exporting structured tables into `data/processed/`.
+   * **Direct Ingestion & File Audit:** Checks presence and file sizes of all 5 raw CSV files in `data/raw/`.
+   * **Step-by-Step 1-to-1 Cleaning:** Uses clear, direct, and transparent Pandas operations (no complex OOP wrappers).
+   * **Calendar Processing:** Date parsing, filling non-event NaNs with `'None'`, weekend flags, event markers, and Christmas closure flags.
+   * **Price Cleaning:** Non-positive price audit, regular baseline price calculation, discount percentage, and `float32` memory downcasting.
+   * **Sales Matrices:** Zero-null and non-negativity verification for both validation (1,913 days) and evaluation (1,941 days) matrices.
+   * **Submission Validation:** Validates the 60,980-row forecast submission structure.
+   * **Verification Scorecard:** Outputs an automated summary verifying row counts, columns, and 0 missing values across all 5 cleaned datasets.
 
 2. **[`02_exploratory_data_analysis.ipynb`](notebooks/02_exploratory_data_analysis.ipynb)**:
-   * Ingestion of cleaned tables from `data/processed/`.
-   * Multi-tier hierarchical sales dynamics (System $\rightarrow$ State $\rightarrow$ Store $\rightarrow$ Category $\rightarrow$ Department).
-   * **Syntetos-Boylan / Croston Demand Categorization:** Computing $ADI$ and $CV^2$ across all 30,490 SKUs.
-   * Intermittent demand characterization (active vs. raw zero rates).
-   * Day-of-week surges (Saturday/Sunday indices) and monthly seasonality.
-   * **SNAP Policy Demand Uplift:** +21.3% (WI), +11.0% (TX), and +7.6% (CA).
-   * Augmented Dickey-Fuller (ADF) stationarity testing and ACF weekly harmonic decay.
-   * **Kalman Filter Latent State Tracking:** Demonstration of filtering observation noise and estimating safety stock bounds.
+   * **Direct Processed Ingestion:** Reads clean CSV datasets directly from `data/processed/`.
+   * **Chain-Wide Sales Trajectory:** Aggregates daily sales across all 30,490 SKUs over 1,913 days, annotating annual Christmas store closures.
+   * **Category & Department Contributions:** Volume breakdowns showing `FOODS` accounts for ~68% of sales, followed by `HOUSEHOLD` (~21%) and `HOBBIES` (~11%).
+   * **Geographic Store & State Breakdown:** Compares sales across California (`CA`), Texas (`TX`), and Wisconsin (`WI`), and across the 10 individual stores.
+   * **Day-of-Week Seasonality:** Average daily sales grouped by weekday, illustrating weekend demand surges on Saturday and Sunday.
+   * **SNAP Policy Effect:** Measures empirical sales uplift on SNAP food assistance disbursement days across CA, TX, and WI.
+   * **Intermittency & Croston Matrix:** Quantifies zero-sales distributions (median >65% zeros per SKU) and Syntetos-Boylan demand categorization (>85% Intermittent or Lumpy).
+   * **Local State Tracking Demo:** Self-contained 1D Kalman filter demo showing how observation noise is filtered into a smooth latent demand state with $\pm 1.96\sigma$ uncertainty intervals for inventory safety stock.
 
 ---
 
