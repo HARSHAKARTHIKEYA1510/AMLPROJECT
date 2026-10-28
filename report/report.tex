@@ -14,9 +14,12 @@
 \usepackage{float}
 \usepackage{array}
 \usepackage{cite}
-\usepackage{algorithm}
-\usepackage{algorithmic}
 \usepackage{textcomp}
+
+% ── Float and layout tuning ──────────────────────────────────────────────
+\setlength{\textfloatsep}{8pt plus 2pt minus 2pt}
+\setlength{\floatsep}{6pt plus 2pt minus 2pt}
+\setlength{\intextsep}{6pt plus 2pt minus 2pt}
 
 % ── Graphics path ─────────────────────────────────────────────────────────
 \graphicspath{{../reports/figures/}}
@@ -29,6 +32,15 @@
     urlcolor=blue
 }
 
+% ── Custom author linebreak for IEEEtran conference ────────────────────────
+\makeatletter
+\newcommand{\linebreakand}{%
+  \end{@IEEEauthorhalign}
+  \hfill\mbox{}\par
+  \mbox{}\hfill\begin{@IEEEauthorhalign}
+}
+\makeatother
+
 % ── Title ─────────────────────────────────────────────────────────────────
 \title{Inventory Demand Forecasting via Kalman Filtering and Global DeepAR Models: A Comparative Analysis}
 
@@ -36,14 +48,17 @@
     \IEEEauthorblockN{Sameer Alam Khan}
     \IEEEauthorblockA{Enrollment No. 2401020054}
     \and
-    \IEEEauthorblockN{Dakarapu Hemamdhar Nath}
-    \IEEEauthorblockA{Enrollment No. 2401010137}
-    \and
     \IEEEauthorblockN{Abhishek Tripathi}
     \IEEEauthorblockA{Enrollment No. 2401010022}
     \and
     \IEEEauthorblockN{Akshay Y}
     \IEEEauthorblockA{Enrollment No. 2401020008}
+    \linebreakand
+    \IEEEauthorblockN{Palaparthi Harsha Karthikeya}
+    \IEEEauthorblockA{Enrollment No. 2401010313}
+    \and
+    \IEEEauthorblockN{Dakarapu Hemamdhar Nath}
+    \IEEEauthorblockA{Enrollment No. 2401010137}
 }
 
 \begin{document}
@@ -54,7 +69,7 @@
 % ABSTRACT
 % ══════════════════════════════════════════════════════════════════════════
 \begin{abstract}
-Accurate demand forecasting is critical for retail inventory management, enabling optimal stock replenishment while minimizing holding costs and stockout events. This paper presents a comparative study of four forecasting methodologies applied to the Walmart M5 Forecasting Accuracy dataset: Seasonal-Naive (statistical baseline), Gradient-Boosted Decision Trees (LightGBM), a Structural State-Space Kalman Filter per SKU, and a Global DeepAR Probabilistic Autoregressive LSTM Network. All models are evaluated on an identical 28-day out-of-sample validation horizon covering 50 product-store series (1,400 observations) under a strict zero-leakage protocol. The Kalman Filter achieves the lowest MAE (0.9333) and WAPE (80.06\%), while Global DeepAR achieves the lowest RMSE (2.2062) and provides calibrated probabilistic prediction intervals. The results demonstrate that no single model dominates across all metrics, and the optimal choice depends on the specific inventory optimization objective.
+Accurate demand forecasting is critical for retail inventory management, enabling optimal stock replenishment while minimizing holding costs and stockout events. This paper presents a comparative study of four forecasting methodologies applied to the Walmart M5 Forecasting Accuracy dataset: Seasonal-Naive (statistical baseline), Gradient-Boosted Decision Trees (LightGBM), a Structural State-Space Kalman Filter per SKU, and a Global DeepAR Probabilistic Autoregressive LSTM Network. All models are evaluated on an identical 28-day out-of-sample validation horizon covering 50 product-store series (1,400 observations) under a strict zero-leakage protocol. The Kalman Filter achieves the lowest MAE (0.9333) and WAPE (80.06\%), while Global DeepAR achieves the lowest RMSE (2.2082) and provides calibrated probabilistic prediction intervals. The results demonstrate that no single model dominates across all metrics, and the optimal choice depends on the specific inventory optimization objective.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -93,8 +108,10 @@ This paper evaluates four forecasting approaches of increasing complexity:
 The M5 Forecasting Accuracy competition dataset comprises five core tables:
 \begin{itemize}
     \item \texttt{sales\_train\_evaluation.csv}: Daily unit sales for 30,490 items across 10 stores (days 1--1941).
+    \item \texttt{sales\_train\_validation.csv}: Historical daily unit sales for days 1--1913.
     \item \texttt{calendar.csv}: Daily calendar attributes, events, and SNAP flags (1,969 days).
-    \item \texttt{sell\_prices.csv}: Weekly store-item sell prices (6.84 million rows).
+    \item \texttt{sell\_prices.csv}: Weekly store--item prices across items and stores (6.84M rows).
+    \item \texttt{sample\_submission.csv}: Official forecasting submission format template.
 \end{itemize}
 
 \subsection{Data Cleaning and Quality Audit}
@@ -302,12 +319,12 @@ Table~\ref{tab:main_results} presents the point-forecast performance of all four
 Seasonal-Naive      & 1.1143 & 2.6030 & 95.59\% \\
 GBDT (LightGBM)     & 0.9512 & 2.2679 & 81.60\% \\
 Kalman Filter        & \textbf{0.9333} & 2.3303 & \textbf{80.06\%} \\
-Global DeepAR        & 0.9748 & \textbf{2.2062} & 83.63\% \\
+Global DeepAR        & 0.9928 & \textbf{2.2082} & 85.16\% \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The Kalman Filter achieves the lowest MAE (0.9333) and WAPE (80.06\%), making it the strongest performer for average absolute error and aggregate relative error. Global DeepAR achieves the lowest RMSE (2.2062), indicating superior performance under a metric that penalizes larger errors more heavily.
+The Kalman Filter achieves the lowest MAE (0.9333) and WAPE (80.06\%), making it the strongest performer for average absolute error and aggregate relative error. Global DeepAR achieves the lowest RMSE (2.2082), indicating superior performance under a metric that penalizes larger errors more heavily.
 
 \subsection{Improvement Over Baseline}
 
@@ -323,7 +340,7 @@ Table~\ref{tab:improvement} quantifies the percentage reduction in each metric r
 \midrule
 GBDT (LightGBM)  & 14.64\% & 12.87\% & 14.64\% \\
 Kalman Filter     & \textbf{16.25\%} & 10.48\% & \textbf{16.25\%} \\
-Global DeepAR     & 12.53\% & \textbf{15.24\%} & 12.51\% \\
+Global DeepAR     & 10.90\% & \textbf{15.17\%} & 10.91\% \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -332,19 +349,19 @@ The Kalman Filter provides the largest reductions in MAE and WAPE, while DeepAR 
 
 \subsection{Category-Level Decomposition}
 
-Performance varies considerably across product categories (Table~\ref{tab:category}). Foods, which represents the highest-volume category, benefits most from the learning-based models. Hobbies, with its inherently sporadic and low-volume demand, proves challenging for all models.
+Performance varies considerably across product categories (Table~\ref{tab:category}). Foods, which represents the highest-volume category, benefits most from the learning-based models, with GBDT achieving 71.77\% and Kalman achieving 72.78\% WAPE. Hobbies, with its inherently sporadic and low-volume demand, proves challenging for all models, with Kalman providing the best relative performance (127.68\%).
 
 \begin{table}[htbp]
 \centering
 \caption{Category-Level WAPE Decomposition}
 \label{tab:category}
-\begin{tabular}{lccc}
+\begin{tabular}{lcccc}
 \toprule
-\textbf{Category} & \textbf{SNaive} & \textbf{GBDT} & \textbf{Kalman} \\
+\textbf{Category} & \textbf{SNaive} & \textbf{GBDT} & \textbf{Kalman} & \textbf{DeepAR} \\
 \midrule
-FOODS     & 89.3\% & 71.8\% & \textbf{72.78\%} \\
-HOBBIES   & 127.8\% & 134.5\% & 127.68\% \\
-HOUSEHOLD & 101.5\% & 89.1\% & \textbf{80.12\%} \\
+FOODS     & 89.31\% & \textbf{71.77\%} & 72.78\% & 75.10\% \\
+HOBBIES   & 127.78\% & 134.49\% & \textbf{127.68\%} & 143.17\% \\
+HOUSEHOLD & 101.47\% & 89.15\% & \textbf{80.12\%} & 90.39\% \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -382,8 +399,8 @@ Table~\ref{tab:probabilistic} compares the uncertainty quantification capabiliti
 \toprule
 \textbf{Metric} & \textbf{Kalman} & \textbf{DeepAR} \\
 \midrule
-80\% CI Coverage  & 80.93\%       & \textbf{91.79\%} \\
-80\% CI Width     & \textbf{2.30 units} & 3.20 units \\
+80\% CI Coverage  & 80.93\%       & \textbf{90.07\%} \\
+80\% CI Width     & \textbf{2.30 units} & 2.87 units \\
 95\% CI Coverage  & 90.07\%       & ---              \\
 95\% CI Width     & 3.14 units    & ---              \\
 Mean Pinball Loss & ---           & \textbf{0.3075}  \\
@@ -391,7 +408,7 @@ Mean Pinball Loss & ---           & \textbf{0.3075}  \\
 \end{tabular}
 \end{table}
 
-The Kalman Filter produces well-calibrated intervals (80.93\% actual coverage at the 80\% nominal level) with narrower interval widths. DeepAR achieves higher coverage (91.79\%) but with wider intervals, suggesting a slight over-coverage tendency.
+The Kalman Filter yields well-calibrated intervals, achieving 80.93\% coverage at the 80\% nominal level with a compact mean width of 2.30 units. In comparison, Global DeepAR achieves 90.07\% empirical coverage with an average width of 2.87 units, demonstrating slight over-coverage relative to the nominal target.
 
 \subsection{Visual Analysis}
 
@@ -466,7 +483,7 @@ Several limitations should be noted when interpreting the results:
 
     \item \textbf{Validation consistency:} The comparison should be interpreted only after confirming that all models use identical validation observations and consistent metric calculations, which has been ensured in this study.
 
-    \item \textbf{DeepAR interval calibration:} While DeepAR achieves 91.79\% coverage at the 80\% nominal level, this over-coverage suggests potential for tighter intervals. A separate assessment of interval sharpness and calibration is warranted.
+    \item \textbf{DeepAR interval calibration:} While DeepAR achieves 90.07\% coverage at the 80\% nominal level, this over-coverage suggests potential for tighter intervals. A separate assessment of interval sharpness and calibration is warranted.
 
     \item \textbf{Hyperparameter sensitivity:} The DeepAR results are subject to training hyperparameter choices (learning rate, hidden dimension, number of epochs). A comprehensive hyperparameter search may yield different rankings.
 
@@ -483,7 +500,7 @@ This paper presents a rigorous comparative study of four demand forecasting meth
 \begin{enumerate}
     \item The \textbf{Kalman Filter} is the strongest choice when minimizing average absolute and aggregate relative errors is the priority, achieving 16.25\% lower MAE and WAPE relative to the Seasonal-Naive baseline.
 
-    \item \textbf{Global DeepAR} is a valuable alternative when larger errors and prediction uncertainty are important considerations, achieving the lowest RMSE (15.24\% reduction over baseline) and providing calibrated probabilistic prediction intervals.
+    \item \textbf{Global DeepAR} is a valuable alternative when larger errors and prediction uncertainty are important considerations, achieving the lowest RMSE (15.17\% reduction over baseline) and providing calibrated probabilistic prediction intervals.
 
     \item \textbf{GBDT (LightGBM)} provides a strong balance across all metrics with consistent 12--15\% improvements over the baseline, while being computationally efficient and interpretable through feature importance analysis.
 
